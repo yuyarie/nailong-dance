@@ -1,7 +1,8 @@
 import { Music, setSfxEnabled, sfxClick, sfxCoin, sfxMiss, ensureCtx, setMenuBgmVolume, setVoiceVolume, Preview } from "./audio.js";
 import { Game, pauseGame } from "./game.js";
-import { analyzeSongFile, CUSTOM_MAX_MB } from "./chartgen.js";
+import { parseMalody, importMalodyFiles } from "./malody.js";
 import { CustomStore } from "./customstore.js";
+import { DEFAULT_KEYS, normalizeKeys, isBindableKey, keyLabel } from './keybindings.js';
 const KEY = 'naiwa_dance_local_save_v1',
   DEFAULTS = {
     'coins': 0x15e,
@@ -47,17 +48,17 @@ const KEY = 'naiwa_dance_local_save_v1',
       'vol': 0.8,
       'sfx': 0x1,
       'offset': 0x0,
-      'bpm': 0x68,
       'speed': 0x1,
+      'keys': [...DEFAULT_KEYS],
       'quality': 0x1,
       'mpView': "quad",
-      'hold': 0x0,
       'pad': 0x1,
       'gap': 0x1,
       'swipe': 0x1,
       'climb': 0x1
     },
     'customSongs': [],
+    'chartSongs': [],
     'saveAt': 0x0
   };
 export const Store = {
@@ -80,7 +81,7 @@ export const Store = {
     }, this.data.scores = {
       ...DEFAULTS.scores,
       ...(this.data.scores || {})
-    }, this.data.usedCodes = this.data.usedCodes || [], void 0, this.data;
+    }, this.data.set.keys = normalizeKeys(this.data.set.keys), this.data.usedCodes = this.data.usedCodes || [], void 0, this.data;
   },
   'save'() {
     this.data.saveAt = Date.now(), localStorage.setItem(KEY, JSON.stringify(this.data));
@@ -89,21 +90,7 @@ export const Store = {
     localStorage.removeItem(KEY), this.load();
   }
 };
-Store.load(), async function migrateCustomSongs() {
-  try {
-    const _0x56b088 = Store.data.customSongs || [];
-    let _0x530bb5 = false;
-    for (const _0x5ced37 of _0x56b088) {
-      if (_0x5ced37.dataUrl || _0x5ced37.file) {
-        const _0x3b418a = _0x5ced37.dataUrl || _0x5ced37.file;
-        await CustomStore.save({
-          'id': _0x5ced37.id
-        }, _0x3b418a, []), delete _0x5ced37.dataUrl, delete _0x5ced37.file, _0x530bb5 = true;
-      }
-    }
-    if (_0x530bb5) Store.save();
-  } catch {}
-}();
+Store.load();
 export const SKINS = [{
   'id': 'classic',
   'name': '经典奶黄',
@@ -652,76 +639,10 @@ export const ACCESSORIES = [{
   'color': 0xff66cc
 }];
 export const SONGS = [{
-  'id': "default",
-  'name': '默认曲目',
-  'artist': '内置BGM',
-  'file': "music.mp3",
-  'bpm': 0x68,
-  'desc': '游戏自带的节奏曲',
-  'cat': "builtin"
+  id: 'default', name: 'ニニ', artist: 'テヅカxQayo',
+  file: 'charts/default/1565767011.ogg', chartFile: 'charts/default/1565787429.mc',
+  bpm: 174, version: '4K Normal Lv.17', desc: '4K Normal Lv.17 · 773 notes · 64 长条', previewStart: 103.104
 }];
-export const SONG_CATS = [{
-  'id': "builtin",
-  'name': "🎮 内置",
-  'tip': "游戏自带"
-}];
-export const DIFFS = [{
-  'id': "easy",
-  'name': "😌 热身",
-  'desc': "每拍一箭 · 轻松上手"
-}, {
-  'id': "normal",
-  'name': '🔥\x20狂热',
-  'desc': '半拍密集\x20·\x20偶有双押'
-}, {
-  'id': "hard",
-  'name': '💀\x20地狱',
-  'desc': '双押连打\x20·\x20手忙脚乱'
-}, {
-  'id': 'endless',
-  'name': "♾️ 无尽",
-  'desc': "单曲无限循环 · 越跳越快 · 退出即结算"
-}];
-const CHART_P = {
-  'easy': {
-    'div': 0x1,
-    'rest': 0.25,
-    'dbl': 0x0,
-    'burst': 0x0
-  },
-  'normal': {
-    'div': 0x2,
-    'rest': 0.1,
-    'dbl': 0.07,
-    'burst': 0x0
-  },
-  'hard': {
-    'div': 0x2,
-    'rest': 0.03,
-    'dbl': 0.14,
-    'burst': 0.05
-  },
-  'endless': {
-    'div': 0x2,
-    'rest': 0.12,
-    'dbl': 0.08,
-    'burst': 0x0
-  }
-};
-export function diffLevel(_0x42276e, _0x41762c) {
-  const _0x3ddd7a = CHART_P[_0x41762c];
-  if (!_0x3ddd7a) return 0x1;
-  const _0x1b5108 = _0x42276e / 0x3c * _0x3ddd7a.div * (0x1 - _0x3ddd7a.rest) * (0x1 + _0x3ddd7a.dbl) + _0x3ddd7a.burst * 0x8;
-  return Math.max(0x1, Math.min(0xf, Math.round(_0x1b5108 * 2.4)));
-}
-export function lvZone(_0x3572c5) {
-  return _0x3572c5 <= 0x5 ? 0x1 : _0x3572c5 <= 0xa ? 0x2 : 0x3;
-}
-export const LV_ZONE_NAMES = {
-  0x1: "🟢 新手区",
-  0x2: "🟡 进阶区",
-  0x3: "🔴 高手区"
-};
 const ACHS = [{
   'id': 'first',
   'ic': '🕺',
@@ -1115,20 +1036,6 @@ const ACHS = [{
   'goal': 0x1e,
   'get': _0x18f054 => _0x18f054.stats.fullCombos
 }, {
-  'id': 'hardFc1',
-  'ic': '💀',
-  'name': "地狱零失误",
-  'desc': "在💀地狱难度完成一次全连",
-  'goal': 0x1,
-  'get': _0xb8f4f0 => _0xb8f4f0.stats.hardFc || 0x0
-}, {
-  'id': "hardFc5",
-  'ic': '🔥',
-  'name': "地狱常驻嘉宾",
-  'desc': "在地狱难度累计 5 次全连",
-  'goal': 0x5,
-  'get': _0xbfa37a => _0xbfa37a.stats.hardFc || 0x0
-}, {
   'id': "ss1",
   'ic': '🏅',
   'name': "初露锋芒",
@@ -1149,41 +1056,6 @@ const ACHS = [{
   'desc': "累计 20 次 SS 评级，全是 SS",
   'goal': 0x14,
   'get': _0x310e0d => _0x310e0d.stats.ssCount
-}, {
-  'id': "es180",
-  'ic': '🕒',
-  'name': '无尽三分钟',
-  'desc': "无尽模式坚持 3 分钟",
-  'goal': 0xb4,
-  'get': _0x3af180 => _0x3af180.stats.endlessBestSec || 0x0
-}, {
-  'id': 'es600',
-  'ic': '⏰',
-  'name': "无尽十分钟",
-  'desc': "无尽模式坚持 10 分钟，腿还在吗？",
-  'goal': 0x258,
-  'get': _0x23fe83 => _0x23fe83.stats.endlessBestSec || 0x0
-}, {
-  'id': "el10",
-  'ic': '🎢',
-  'name': "单曲循环十遍",
-  'desc': "无尽模式同一首歌连跳 10 遍不吐",
-  'goal': 0xa,
-  'get': _0x42d6e9 => _0x42d6e9.stats.endlessLoops || 0x0
-}, {
-  'id': 'er15',
-  'ic': '🚀',
-  'name': "一级加速",
-  'desc': "无尽模式把速度顶到 ×1.5",
-  'goal': 0xf,
-  'get': _0x31868a => _0x31868a.stats.endlessMaxRate || 0x0
-}, {
-  'id': "er20",
-  'ic': '🛸',
-  'name': '二倍速穿越',
-  'desc': "无尽模式把速度顶到 ×2.0，奶娃飞出屏幕",
-  'goal': 0x14,
-  'get': _0x396df5 => _0x396df5.stats.endlessMaxRate || 0x0
 }, {
   'id': 'coin1k',
   'ic': '🪙',
@@ -1284,7 +1156,7 @@ const ACHS = [{
   'get': _0x2d0e29 => _0x2d0e29.stats.loginStreak || 0x0
 }];
 let sel = {
-    'diff': "normal",
+    'diff': "chart",
     'song': "default"
   },
   mainRef = null;
@@ -1326,9 +1198,9 @@ export function initUI(_0x35588b) {
     sfxClick(), openCustomModal();
   });
   _0xc14aea && _0xc14aea.addEventListener("change", async _0x15020 => {
-    const _0x3fc9d5 = _0x15020.target.files[0x0];
+    const _0x3fc9d5 = Array.from(_0x15020.target.files);
     _0x15020.target.value = '';
-    if (_0x3fc9d5) await handleCustomUpload(_0x3fc9d5);
+    if (_0x3fc9d5.length) await handleCustomUpload(_0x3fc9d5);
   });
   _0xc14aea && _0xc14aea.addEventListener('click', () => {
     sfxClick();
@@ -1447,130 +1319,34 @@ export function renderHome() {
     _0x448653.textContent = "🏆 本赛季「" + _0xe2b34f.seasonName + "」 · " + _0xe2b34f.range;
   }
 }
+function allChartSongs() { return [...SONGS, ...(Store.data.chartSongs || [])]; }
 function renderPlay() {
-  const _0x18e00c = songQ.trim().toLowerCase(),
-    _0x210ae7 = _0xa458d1 => !_0x18e00c || ((_0xa458d1.name || '') + '\x20' + (_0xa458d1.artist || '')).toLowerCase().includes(_0x18e00c),
-    _0xc45c5b = _0x370b04 => {
-      if (!lvZoneFilter) return true;
-      return lvZone(diffLevel(_0x370b04.bpm || 0x68, sel.diff)) === lvZoneFilter;
-    },
-    _0x18e613 = _0x2aaa9a => {
-      const _0x37886a = diffLevel(_0x2aaa9a.bpm || 0x68, sel.diff);
-      return "<span class=\"lv-badge lvz" + lvZone(_0x37886a) + "\">Lv." + _0x37886a + "</span>";
-    },
-    _0x156da5 = document.getElementById("lvZoneRow");
-  _0x156da5 && (_0x156da5.innerHTML = '', [{
-    'id': 0x0,
-    'name': '全部'
-  }, {
-    'id': 0x1,
-    'name': LV_ZONE_NAMES[0x1]
-  }, {
-    'id': 0x2,
-    'name': LV_ZONE_NAMES[0x2]
-  }, {
-    'id': 0x3,
-    'name': LV_ZONE_NAMES[0x3]
-  }].forEach(_0x10d261 => {
-    const _0x51c247 = document.createElement('button');
-    _0x51c247.className = "lvz-chip" + (lvZoneFilter === _0x10d261.id ? " on" : ''), _0x51c247.textContent = _0x10d261.name, _0x51c247.onclick = () => {
-      sfxClick(), lvZoneFilter = _0x10d261.id, renderPlay();
-    }, _0x156da5.appendChild(_0x51c247);
-  }));
-  const _0x4ce438 = document.getElementById("songGrid");
-  if (_0x4ce438) {
-    _0x4ce438.innerHTML = '';
-    const _0x27cf5e = _0x22b73c => {
-        const _0x431858 = document.createElement("div");
-        _0x431858.className = 'theme-card\x20song-card' + (sel.song === _0x22b73c.id ? '\x20sel' : ''), _0x431858.style.background = 'linear-gradient(135deg,\x20#7a4dffcc,\x20#36d1ffcc)', _0x431858.innerHTML = "<div class=\"tname\">🎵 " + _0x22b73c.name + '\x20' + _0x18e613(_0x22b73c) + '</div><div\x20class=\x22tdesc\x22>' + _0x22b73c.artist + '\x20·\x20' + _0x22b73c.bpm + "BPM<br>" + _0x22b73c.desc + "</div>\n        <button class=\"pv-btn" + (pvSongId === _0x22b73c.id ? " on" : '') + "\" data-pv=\"" + _0x22b73c.id + '\x22>' + (pvSongId === _0x22b73c.id ? "⏸ 正在播放" : "▶ 试听") + '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' + (sel.song === _0x22b73c.id ? '<span\x20class=\x22tag\x22>✓\x20已选</span>' : ''), _0x431858.onclick = () => {
-          sfxClick(), stopPreview(), sel.song = _0x22b73c.id, renderPlay();
-        }, _0x431858.querySelector("[data-pv]").onclick = _0xd4e076 => {
-          _0xd4e076.stopPropagation(), previewSong(_0x22b73c);
-        }, _0x4ce438.appendChild(_0x431858);
-      },
-      _0x76ce6e = _0x18e00c || lvZoneFilter;
-    if (_0x76ce6e) SONG_CATS.forEach(_0x4a2c56 => {
-      const _0x52cc72 = SONGS.filter(_0x54d792 => _0x54d792.cat === _0x4a2c56.id && _0x210ae7(_0x54d792) && _0xc45c5b(_0x54d792));
-      if (!_0x52cc72.length) return;
-      const _0x2f7a48 = document.createElement('div');
-      _0x2f7a48.className = "song-cat-head", _0x2f7a48.innerHTML = '<span\x20class=\x22sc-name\x22>' + _0x4a2c56.name + '</span><span\x20class=\x22sc-tip\x22>' + _0x4a2c56.tip + '\x20·\x20' + _0x52cc72.length + " 首</span>", _0x4ce438.appendChild(_0x2f7a48), _0x52cc72.forEach(_0x27cf5e);
-    });else {
-      const _0x4970d3 = SONG_CATS.map(_0x1a19d0 => ({
-        'cat': _0x1a19d0,
-        'list': SONGS.filter(_0x546139 => _0x546139.cat === _0x1a19d0.id && _0x210ae7(_0x546139) && _0xc45c5b(_0x546139))
-      })).filter(_0x23081e => _0x23081e.list.length);
-      if (_0x4970d3.length) {
-        if (songPage >= _0x4970d3.length) songPage = 0x0;
-        const _0x5bc5d9 = _0x4970d3[songPage],
-          _0x15d80a = document.createElement("div");
-        _0x15d80a.className = "song-pager", _0x15d80a.innerHTML = "<button class=\"pg-btn\" id=\"pgPrev\">‹</button>\n          <div class=\"pg-mid\"><span class=\"sc-name\">" + _0x5bc5d9.cat.name + "</span><span class=\"sc-tip\">" + (songPage + 0x1) + '\x20/\x20' + _0x4970d3.length + " · " + _0x5bc5d9.list.length + '\x20首</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22pg-btn\x22\x20id=\x22pgNext\x22>›</button>', _0x4ce438.appendChild(_0x15d80a), _0x15d80a.querySelector('#pgPrev').onclick = () => {
-          sfxClick(), songPage = (songPage - 0x1 + _0x4970d3.length) % _0x4970d3.length, renderPlay();
-        }, _0x15d80a.querySelector("#pgNext").onclick = () => {
-          sfxClick(), songPage = (songPage + 0x1) % _0x4970d3.length, renderPlay();
-        }, _0x5bc5d9.list.forEach(_0x27cf5e);
-        if (!_0x4ce438._swipeBound) {
-          _0x4ce438._swipeBound = 0x1;
-          let _0x5a48c2 = 0x0,
-            _0x45a0f1 = 0x0;
-          _0x4ce438.addEventListener("touchstart", _0xb381f5 => {
-            _0x5a48c2 = _0xb381f5.touches[0x0].clientX, _0x45a0f1 = _0xb381f5.touches[0x0].clientY;
-          }, {
-            'passive': true
-          }), _0x4ce438.addEventListener('touchend', _0x33223c => {
-            const _0x53743a = _0x33223c.changedTouches[0x0].clientX - _0x5a48c2,
-              _0x399c1c = _0x33223c.changedTouches[0x0].clientY - _0x45a0f1;
-            if (Math.abs(_0x53743a) > 0x3c && Math.abs(_0x53743a) > Math.abs(_0x399c1c) * 1.5) {
-              const _0x1bd97a = SONG_CATS.filter(_0x3b38d8 => SONGS.some(_0x15d39f => _0x15d39f.cat === _0x3b38d8.id)).length;
-              _0x1bd97a > 0x1 && (sfxClick(), songPage = (songPage + (_0x53743a < 0x0 ? 0x1 : -0x1) + _0x1bd97a) % _0x1bd97a, renderPlay());
-            }
-          }, {
-            'passive': true
-          });
-        }
-      }
-    }
+  document.getElementById('playKeyTip').textContent = Store.data.set.keys.map((code, index) => 'key' + (index + 1) + ': ' + keyLabel(code)).join(' · ') + ' · 长条按住至结束 · 设置中可修改键位和判定延迟';
+  const grid = document.getElementById('songGrid');
+  grid.innerHTML = '';
+  const query = songQ.trim().toLowerCase();
+  const songs = allChartSongs().filter(song => (song.name + ' ' + song.artist + ' ' + (song.version || '')).toLowerCase().includes(query));
+  for (const song of songs) {
+    const card = document.createElement('div');
+    card.className = 'theme-card song-card' + (sel.song === song.id ? ' sel' : '');
+    card.style.background = song.chartFile ? 'linear-gradient(135deg,#7a4dffcc,#36d1ffcc)' : 'linear-gradient(135deg,#ff6b6bcc,#ffa751cc)';
+    card.innerHTML = '<div class="tname">🎵 ' + escHtml(song.name) + '</div><div class="tdesc">' + escHtml(song.artist) + ' · ' + song.bpm + ' BPM<br>' + escHtml(song.desc) + '</div><div class="cs-actions"><button class="pv-btn' + (pvSongId === song.id ? ' on' : '') + '" data-pv="' + song.id + '">' + (pvSongId === song.id ? '⏸ 正在播放' : '▶ 试听') + '</button>' + (song.chartFile ? '' : '<button class="cs-del" title="删除谱面">🗑</button>') + '</div>' + (sel.song === song.id ? '<span class="tag">✓ 已选</span>' : '');
+    card.onclick = () => { sfxClick(); stopPreview(); sel.song = song.id; renderPlay(); };
+    card.querySelector('[data-pv]').onclick = event => { event.stopPropagation(); previewSong(song); };
+    const del = card.querySelector('.cs-del');
+    if (del) del.onclick = async event => { event.stopPropagation(); await deleteChart(song); };
+    grid.appendChild(card);
   }
-  const _0x4e1aa9 = document.getElementById('customSongs'),
-    _0x11d8e7 = document.getElementById("customSongGrid");
-  if (_0x4e1aa9 && _0x11d8e7) {
-    const _0x488326 = (Store.data.customSongs || []).filter(_0x1d5d1c => _0x210ae7(_0x1d5d1c) && _0xc45c5b(_0x1d5d1c));
-    _0x488326.length ? (_0x4e1aa9.style.display = '', _0x11d8e7.innerHTML = '', _0x488326.forEach(_0x50cad2 => {
-      const _0x435a75 = document.createElement("div");
-      _0x435a75.className = "theme-card song-card custom-song-card" + (sel.song === _0x50cad2.id ? '\x20sel' : ''), _0x435a75.style.background = "linear-gradient(135deg, #ff6b6bcc, #ffa751cc)", _0x435a75.innerHTML = "<div class=\"tname\">🎤 " + _0x50cad2.name + '\x20' + _0x18e613(_0x50cad2) + "</div><div class=\"tdesc\">" + (_0x50cad2.artist || "自定义") + '\x20·\x20' + _0x50cad2.bpm + "BPM<br>" + (_0x50cad2.desc || "本地上传") + "</div>\n          <div class=\"cs-actions\">\n            <button class=\"pv-btn" + (pvSongId === _0x50cad2.id ? " on" : '') + "\" data-pv=\"" + _0x50cad2.id + '\x22>' + (pvSongId === _0x50cad2.id ? "⏸ 正在播放" : '▶\x20试听') + "</button>\n            <button class=\"cs-del\" data-del=\"" + _0x50cad2.id + '\x22\x20title=\x22删除这首\x22>🗑</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' + (sel.song === _0x50cad2.id ? "<span class=\"tag\">✓ 已选</span>" : ''), _0x435a75.onclick = () => {
-        sfxClick(), stopPreview(), sel.song = _0x50cad2.id, renderPlay();
-      }, _0x435a75.querySelector("[data-pv]").onclick = _0x4302b8 => {
-        _0x4302b8.stopPropagation(), previewSong(_0x50cad2);
-      }, _0x435a75.querySelector("[data-del]").onclick = async _0x363327 => {
-        _0x363327.stopPropagation();
-        const _0x1e99ee = await askConfirm("删除自定义歌曲「" + _0x50cad2.name + '」？');
-        if (!_0x1e99ee) return;
-        await CustomStore.remove(_0x50cad2.id), Store.data.customSongs = _0x488326.filter(_0x569766 => _0x569766.id !== _0x50cad2.id), Store.save();
-        if (sel.song === _0x50cad2.id) sel.song = SONGS[0x0].id;
-        sfxClick(), renderPlay(), toast("已删除");
-      }, _0x11d8e7.appendChild(_0x435a75);
-    })) : _0x4e1aa9.style.display = "none";
-  }
-  const _0x55034a = (SONGS.find(_0x42bbcd => _0x42bbcd.id === sel.song) || (Store.data.customSongs || []).find(_0x4c7d31 => _0x4c7d31.id === sel.song) || {}).bpm || 0x68,
-    _0x1632f5 = document.getElementById("diffRow");
-  _0x1632f5.innerHTML = '', DIFFS.forEach(_0x1ea284 => {
-    const _0x9d747 = diffLevel(_0x55034a, _0x1ea284.id),
-      _0x1d6fe3 = document.createElement("div");
-    _0x1d6fe3.className = "diff-card" + (sel.diff === _0x1ea284.id ? " sel" : ''), _0x1d6fe3.innerHTML = "<div class=\"dname\">" + _0x1ea284.name + " <span class=\"lv-badge lvz" + lvZone(_0x9d747) + "\">Lv." + _0x9d747 + "</span></div><div class=\"ddesc\">" + _0x1ea284.desc + "</div>", _0x1d6fe3.onclick = () => {
-      sfxClick(), sel.diff = _0x1ea284.id, renderPlay();
-    }, _0x1632f5.appendChild(_0x1d6fe3);
-  });
-  const _0x23684f = document.getElementById("holdChip");
-  if (_0x23684f) {
-    const _0x2beae7 = !!Store.data.set.hold;
-    _0x23684f.className = "mode-chip" + (_0x2beae7 ? " on" : ''), _0x23684f.innerHTML = _0x2beae7 ? "🎹 长条模式：<b>开</b> · 按得越久分越高，按满得满分" : "🎹 长条模式：关", _0x23684f.onclick = () => {
-      sfxClick(), Store.data.set.hold = _0x2beae7 ? 0x0 : 0x1, Store.save(), renderPlay();
-    };
-  }
+  if (!songs.length) grid.innerHTML = '<div class="rank-empty">没有匹配的谱面</div>';
 }
-let pvSongId = null,
-  songQ = '',
-  songPage = 0x0,
-  lvZoneFilter = 0x0;
+async function deleteChart(song) {
+  if (!await askConfirm('删除导入的谱面「' + song.name + '」？')) return;
+  await CustomStore.remove(song.id);
+  Store.data.chartSongs = (Store.data.chartSongs || []).filter(item => item.id !== song.id);
+  Store.save(); if (sel.song === song.id) sel.song = SONGS[0].id;
+  stopPreview(); renderPlay(); renderCustomList(); toast('已删除谱面');
+}
+let pvSongId = null, songQ = '';
 async function previewSong(_0x4f8d72) {
   if (pvSongId === _0x4f8d72.id) {
     sfxClick(), stopPreview();
@@ -1578,7 +1354,7 @@ async function previewSong(_0x4f8d72) {
   }
   sfxClick(), pvSongId = _0x4f8d72.id, Store.data.stats.previewCount = (Store.data.stats.previewCount || 0x0) + 0x1, Store.save();
   let _0x53ffd9 = _0x4f8d72.file;
-  if (/^custom_/.test(_0x4f8d72.id)) {
+  if (/^chart_/.test(_0x4f8d72.id)) {
     const _0x8a69ff = await CustomStore.get(_0x4f8d72.id);
     if (pvSongId !== _0x4f8d72.id) return;
     if (!_0x8a69ff) {
@@ -1602,17 +1378,29 @@ function stopPreview() {
 export function getSelection() {
   return sel;
 }
+let startingShow = false;
+const builtinCharts = new Map();
 export async function startShow() {
-  stopPreview();
-  const _0x4cfa5c = (Store.data.customSongs || []).find(_0xf73f78 => _0xf73f78.id === sel.song);
-  if (_0x4cfa5c) {
-    const _0x5b850a = await CustomStore.get(_0x4cfa5c.id);
-    if (!_0x5b850a) {
-      toast('歌曲文件缺失，请重新上传');
-      return;
+  if (startingShow) return;
+  startingShow = true; stopPreview();
+  try {
+    const song = allChartSongs().find(item => item.id === sel.song) || SONGS[0];
+    let chart, audio;
+    if (song.chartFile) {
+      if (!builtinCharts.has(song.id)) {
+        const response = await fetch(song.chartFile);
+        if (!response.ok) throw new Error('默认谱面读取失败');
+        builtinCharts.set(song.id, parseMalody(await response.text()));
+      }
+      chart = builtinCharts.get(song.id); audio = song.file;
+    } else {
+      const stored = await CustomStore.get(song.id);
+      if (!stored?.chart) throw new Error('谱面文件缺失，请重新导入');
+      chart = stored.chart; audio = stored.dataUrl;
     }
-    mainRef.startShow(sel.diff, _0x4cfa5c.id, _0x5b850a.dataUrl, _0x4cfa5c.bpm, _0x5b850a.onsets);
-  } else mainRef.startShow(sel.diff, sel.song);
+    await mainRef.startShow(song, audio, chart);
+  } catch (error) { toast(error.message || '谱面加载失败'); }
+  finally { startingShow = false; }
 }
 function openCustomModal() {
   const _0x332164 = document.getElementById('customModal');
@@ -1624,88 +1412,42 @@ function closeCustomModal() {
   if (_0xac118f) _0xac118f.classList.remove('on');
 }
 function renderCustomList() {
-  const _0x2016a7 = document.getElementById("cmList");
-  if (!_0x2016a7) return;
-  const _0x2623d0 = Store.data.customSongs || [];
-  if (!_0x2623d0.length) {
-    _0x2016a7.innerHTML = '<div\x20class=\x22cm-empty\x22>还没有上传过歌曲，选一首本地音乐试试吧～</div>';
-    return;
-  }
-  _0x2016a7.innerHTML = '', _0x2623d0.forEach(_0x2f8d28 => {
-    const _0x4ce86a = document.createElement("div");
-    _0x4ce86a.className = 'cm-item' + (sel.song === _0x2f8d28.id ? " sel" : ''), _0x4ce86a.innerHTML = "<div class=\"cm-info\"><div class=\"cm-name\">🎤 " + _0x2f8d28.name + "</div>\n      <div class=\"cm-meta\">" + _0x2f8d28.bpm + " BPM · " + (_0x2f8d28.desc || '') + "</div></div>\n      <button class=\"cm-use\" data-use=\"" + _0x2f8d28.id + '\x22>' + (sel.song === _0x2f8d28.id ? "✓ 已选" : '选它') + "</button>\n      <button class=\"cm-del\" data-cdel=\"" + _0x2f8d28.id + "\">🗑</button>", _0x4ce86a.querySelector("[data-use]").onclick = async () => {
-      sfxClick();
-      const _0x1d4587 = await CustomStore.get(_0x2f8d28.id);
-      if (!_0x1d4587) {
-        toast("歌曲文件缺失，请重新上传");
-        return;
-      }
-      sel.song = _0x2f8d28.id, closeCustomModal(), renderPlay(), toast("已选中「" + _0x2f8d28.name + '」，点开始表演开跳！');
-    }, _0x4ce86a.querySelector("[data-cdel]").onclick = async () => {
-      const _0x2bab5d = await askConfirm("删除自定义歌曲「" + _0x2f8d28.name + '」？');
-      if (!_0x2bab5d) return;
-      await CustomStore.remove(_0x2f8d28.id), Store.data.customSongs = (Store.data.customSongs || []).filter(_0x3c3bd8 => _0x3c3bd8.id !== _0x2f8d28.id), Store.save();
-      if (sel.song === _0x2f8d28.id) sel.song = SONGS[0x0].id;
-      sfxClick(), renderCustomList(), renderPlay();
-    }, _0x2016a7.appendChild(_0x4ce86a);
+  const list = document.getElementById('cmList');
+  if (!list) return;
+  list.innerHTML = '';
+  const songs = Store.data.chartSongs || [];
+  if (!songs.length) { list.innerHTML = '<div class="cm-empty">还没有导入谱面，同时选择 .mc 和它对应的音乐文件吧～</div>'; return; }
+  songs.forEach(song => {
+    const item = document.createElement('div'); item.className = 'cm-item';
+    item.innerHTML = '<div class="cm-info"><div class="cm-name">🎵 ' + escHtml(song.name) + '</div><div class="cm-meta">' + escHtml(song.desc) + '</div></div><button class="cm-use">选它</button><button class="cm-del">🗑</button>';
+    item.querySelector('.cm-use').onclick = () => { sel.song = song.id; closeCustomModal(); renderPlay(); };
+    item.querySelector('.cm-del').onclick = () => deleteChart(song);
+    list.appendChild(item);
   });
 }
-async function handleCustomUpload(_0x3045fb) {
-  const _0x43f993 = document.getElementById("cmProgress"),
-    _0x58c22c = document.getElementById("cmPick"),
-    _0x45aa33 = document.getElementById("fileSong"),
-    _0x4f82a1 = {
-      0.05: '读取文件中…',
-      0.25: '解码音频中…',
-      0.55: '分析节拍中…',
-      0.7: "检测鼓点中…",
-      0.88: "估算 BPM 中…",
-      0x1: "生成乐谱中…"
-    };
+async function handleCustomUpload(files) {
+  const input = document.getElementById('fileSong');
+  const progress = document.getElementById('cmProgress');
+  const pick = document.getElementById('cmPick');
+  input.disabled = true; pick.classList.add('busy'); progress.classList.add('on');
+  progress.querySelector('.cm-label').textContent = '读取谱面与配套音乐中…';
+  progress.querySelector('.cm-bar').style.width = '35%';
   try {
-    if (_0x43f993) _0x43f993.classList.add('on');
-    if (_0x58c22c) _0x58c22c.classList.add('busy');
-    if (_0x45aa33) _0x45aa33.disabled = true;
-    const _0x166ad2 = _0x8af0d => {
-      if (!_0x43f993) return;
-      let _0x5b9f0e = "解析中…";
-      const _0xdeeca5 = Object.keys(_0x4f82a1).map(Number).sort((_0x57833e, _0x3fbdb9) => _0x57833e - _0x3fbdb9);
-      for (const _0x5e9078 of _0xdeeca5) {
-        if (_0x8af0d >= _0x5e9078) _0x5b9f0e = _0x4f82a1[_0x5e9078];
-      }
-      _0x43f993.querySelector(".cm-bar").style.width = Math.round(_0x8af0d * 0x64) + '%', _0x43f993.querySelector(".cm-label").textContent = _0x5b9f0e + '\x20' + Math.round(_0x8af0d * 0x64) + '%';
-    };
-    _0x166ad2(0.02);
-    const _0x1af057 = await analyzeSongFile(_0x3045fb, _0x166ad2);
-    _0x166ad2(0x1);
-    if ((Store.data.customSongs || []).length >= 0xc) throw new Error('too-many');
-    const _0x4d8d4a = "custom_" + Date.now(),
-      _0x3fbc0f = Math.floor(_0x1af057.dur / 0x3c),
-      _0x1459b2 = Math.round(_0x1af057.dur % 0x3c),
-      _0x11a4eb = {
-        'id': _0x4d8d4a,
-        'name': _0x1af057.name,
-        'artist': "我的上传",
-        'bpm': _0x1af057.bpm,
-        'dur': +_0x1af057.dur.toFixed(0x1),
-        'desc': "时长 " + _0x3fbc0f + ':' + String(_0x1459b2).padStart(0x2, '0') + " · 自动谱面",
-        'cat': "custom"
-      };
-    await CustomStore.save(_0x11a4eb, _0x1af057.dataUrl, _0x1af057.onsets), Store.data.customSongs = Store.data.customSongs || [], Store.data.customSongs.push(_0x11a4eb), Store.data.stats.uploadCount = (Store.data.stats.uploadCount || 0x0) + 0x1, Store.save(), sel.song = _0x4d8d4a, sfxCoin(), toast("🎤 解析完成：" + _0x1af057.bpm + " BPM，已选中「" + _0x1af057.name + '」！'), renderCustomList(), renderPlay();
-  } catch (_0x22a564) {
-    const _0xb4b9ee = {
-      'file-too-big': "音频文件太大啦（上限 " + CUSTOM_MAX_MB + "MB），换个短一点的曲子吧",
-      'bad-type': '不支持的文件格式，请上传\x20mp3\x20/\x20wav\x20/\x20ogg\x20/\x20m4a',
-      'decode-failed': "音频解码失败，可能文件损坏或格式不受支持",
-      'bad-duration': "歌曲时长需要在 8 秒 ~ 10 分钟之间",
-      'too-many': "最多保存 12 首自定义歌，先删掉几首吧"
-    };
-    toast(_0xb4b9ee[_0x22a564.message] || '解析失败：' + (_0x22a564.message || '未知错误'));
-  } finally {
-    _0x43f993 && (_0x43f993.classList.remove('on'), _0x43f993.querySelector('.cm-bar').style.width = '0%');
-    if (_0x58c22c) _0x58c22c.classList.remove("busy");
-    if (_0x45aa33) _0x45aa33.disabled = false;
-  }
+    const imported = await importMalodyFiles(files);
+    for (const entry of imported) {
+      const chart = entry.chart;
+      const id = 'chart_' + Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
+      const meta = { id, name: chart.name, artist: chart.artist, bpm: chart.bpm,
+        version: chart.version, dur: entry.duration, previewStart: chart.previewStart,
+        desc: chart.version + ' · ' + chart.notes.length + ' notes · ' + chart.notes.filter(note => note.len).length + ' 长条' };
+      await CustomStore.saveChart(meta, entry.dataUrl, chart);
+      Store.data.chartSongs = Store.data.chartSongs || []; Store.data.chartSongs.push(meta);
+      Store.data.stats.uploadCount = (Store.data.stats.uploadCount || 0) + 1;
+      sel.song = id; Store.save();
+    }
+    renderCustomList(); renderPlay(); sfxCoin(); toast('已导入 ' + imported.length + ' 个 4Key 谱面');
+  } catch (error) { toast('导入失败：' + error.message); }
+  finally { input.disabled = false; pick.classList.remove('busy'); progress.classList.remove('on'); }
 }
 const SHOP_CATEGORIES = [
   { id: 'paint', name: '🎨 身体涂装', tip: '改变奶娃的身体颜色', items: () => SKINS.filter(item => !item.fx) },
@@ -1846,17 +1588,25 @@ function renderAch() {
     _0x312b93.className = "ach-item" + (_0x23195f ? " done" : ''), _0x312b93.innerHTML = "\n      <div class=\"ai\">" + _0x560eb1.ic + "</div>\n      <div class=\"amid\">\n        <div class=\"aname\">" + _0x560eb1.name + '\x20' + (_0x23195f ? '✓' : '') + "</div>\n        <div class=\"adesc\">" + _0x560eb1.desc + '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22abar\x22><i\x20style=\x22width:' + _0x56ac67 / _0x560eb1.goal * 0x64 + "%\"></i></div>\n      </div>\n      <div class=\"aright\">" + (_0x23195f ? '已完成' : _0x39e8da(_0x56ac67) + " / " + _0x39e8da(_0x560eb1.goal)) + "</div>", _0x2ff825.appendChild(_0x312b93);
   });
 }
-const songName = _0x30837f => (SONGS.find(_0x2d8426 => _0x2d8426.id === _0x30837f) || {}).name || _0x30837f;
+const songName = id => (allChartSongs().find(song => song.id === id) || {}).name || id;
 function displayName() {
   return Store.data.name || '奶娃' + (Store.data.playerId || "XXXXXX").slice(-0x4);
 }
 function renderRank() {
-  renderRankList(document.querySelector("#rankTabs button.cur").dataset.d);
+  const tabs = document.getElementById('rankTabs');
+  tabs.innerHTML = '';
+  allChartSongs().forEach((song, index) => {
+    const button = document.createElement('button'); button.textContent = song.name + ' · ' + (song.version || '4Key');
+    button.dataset.d = song.id; if (!index) button.classList.add('cur');
+    button.onclick = () => { tabs.querySelectorAll('button').forEach(item => item.classList.remove('cur')); button.classList.add('cur'); renderRankList(song.id); };
+    tabs.appendChild(button);
+  });
+  renderRankList(SONGS[0].id);
 }
 function renderRankList(_0x79265a) {
   const _0x2f7c90 = document.getElementById("rankList");
   _0x2f7c90.innerHTML = '';
-  const _0x286fc6 = [...(Store.data.scores[_0x79265a] || [])].sort((_0x23e78f, _0x41a903) => _0x41a903.score - _0x23e78f.score).slice(0x0, 0x5);
+  const _0x286fc6 = [...(Store.data.chartScores?.[_0x79265a] || [])].sort((_0x23e78f, _0x41a903) => _0x41a903.score - _0x23e78f.score).slice(0x0, 0x5);
   if (!_0x286fc6.length) {
     _0x2f7c90.innerHTML = "<div class=\"rank-empty\">暂无纪录 —— 上去就是第一名！</div>";
     return;
@@ -1875,18 +1625,46 @@ function escHtml(_0x1d4457) {
     '\x27': "&#39;"
   })[_0x18c845]);
 }
+function bindKeySettings() {
+  const buttons = [...document.querySelectorAll('[data-key-slot]')];
+  const tip = document.getElementById('keyBindingTip');
+  const help = '从左到右对应 key1～key4。点击按钮后按下新键，Esc 取消；键位自动保存。';
+  let listening = null;
+  const render = () => buttons.forEach((button, index) => {
+    button.querySelector('b').textContent = listening === index ? '请按键…' : keyLabel(Store.data.set.keys[index]);
+    button.classList.toggle('listening', listening === index);
+  });
+  buttons.forEach((button, index) => {
+    button.onclick = () => { listening = index; tip.textContent = '正在绑定 key' + (index + 1) + '，请按一个新键（Esc 取消）'; render(); };
+    button.onblur = () => { if (listening === index) { listening = null; tip.textContent = help; render(); } };
+    button.onkeydown = event => {
+      if (listening !== index) return;
+      event.preventDefault(); event.stopPropagation();
+      if (event.repeat) return;
+      if (event.code === 'Escape') { listening = null; tip.textContent = help; render(); return; }
+      if (event.ctrlKey || event.altKey || event.metaKey || !isBindableKey(event.code)) {
+        tip.textContent = '请选择普通单键；Esc、Tab 和组合键不用于轨道绑定。'; return;
+      }
+      const occupied = Store.data.set.keys.indexOf(event.code);
+      if (occupied !== -1 && occupied !== index) {
+        tip.textContent = '这个键已绑定 key' + (occupied + 1) + '，请换一个键。'; return;
+      }
+      Store.data.set.keys[index] = event.code; Store.save(); listening = null;
+      tip.textContent = 'key' + (index + 1) + ' 已绑定为 ' + keyLabel(event.code); render();
+    };
+  });
+  render();
+}
 function bindSettings() {
+  bindKeySettings();
   const _0x224649 = Store.data.set,
     _0x3f3ed7 = _0x41e1a3 => document.getElementById(_0x41e1a3),
     _0x2ea597 = _0x3f3ed7('setVol'),
-    _0x5e54ac = _0x3f3ed7('setOffset'),
-    _0x5a4cab = _0x3f3ed7("setBpm");
-  _0x2ea597.value = _0x224649.vol * 0x64, _0x3f3ed7("setVolV").textContent = Math.round(_0x224649.vol * 0x64) + '%', _0x5e54ac.value = _0x224649.offset, _0x3f3ed7("setOffsetV").textContent = _0x224649.offset + 'ms', _0x5a4cab.value = _0x224649.bpm, _0x3f3ed7("setBpmV").textContent = _0x224649.bpm, _0x3f3ed7("setSfx").value = String(_0x224649.sfx), _0x3f3ed7('setSpeed').value = String(_0x224649.speed || 0x1), _0x3f3ed7('setSpeedV').textContent = (_0x224649.speed || 0x1).toFixed(0x1) + '×', _0x3f3ed7("setQuality").value = String(_0x224649.quality), _0x3f3ed7("setPad").value = String(_0x224649.pad == null ? 0x1 : _0x224649.pad), _0x3f3ed7('setGap').value = String(_0x224649.gap == null ? 0x1 : _0x224649.gap), _0x3f3ed7("setSwipe").value = String(_0x224649.swipe == null ? 0x1 : _0x224649.swipe), _0x3f3ed7("setClimb").value = String(_0x224649.climb == null ? 0x1 : _0x224649.climb), _0x2ea597.oninput = () => {
+    _0x5e54ac = _0x3f3ed7('setOffset');
+  _0x2ea597.value = _0x224649.vol * 0x64, _0x3f3ed7("setVolV").textContent = Math.round(_0x224649.vol * 0x64) + '%', _0x5e54ac.value = _0x224649.offset, _0x3f3ed7("setOffsetV").textContent = _0x224649.offset + 'ms', _0x3f3ed7("setSfx").value = String(_0x224649.sfx), _0x3f3ed7('setSpeed').value = String(_0x224649.speed || 0x1), _0x3f3ed7('setSpeedV').textContent = (_0x224649.speed || 0x1).toFixed(0x1) + '×', _0x3f3ed7("setQuality").value = String(_0x224649.quality), _0x3f3ed7("setPad").value = String(_0x224649.pad == null ? 0x1 : _0x224649.pad), _0x3f3ed7('setGap').value = String(_0x224649.gap == null ? 0x1 : _0x224649.gap), _0x3f3ed7("setSwipe").value = String(_0x224649.swipe == null ? 0x1 : _0x224649.swipe), _0x3f3ed7("setClimb").value = String(_0x224649.climb == null ? 0x1 : _0x224649.climb), _0x2ea597.oninput = () => {
     _0x224649.vol = _0x2ea597.value / 0x64, _0x3f3ed7('setVolV').textContent = _0x2ea597.value + '%', applyVolume(), Store.save();
   }, _0x5e54ac.oninput = () => {
     _0x224649.offset = +_0x5e54ac.value, _0x3f3ed7("setOffsetV").textContent = _0x5e54ac.value + 'ms', Store.save();
-  }, _0x5a4cab.oninput = () => {
-    _0x224649.bpm = +_0x5a4cab.value, _0x3f3ed7("setBpmV").textContent = _0x5a4cab.value, Store.save();
   }, _0x3f3ed7("setSfx").onchange = _0x209ded => {
     _0x224649.sfx = +_0x209ded.target.value, setSfxEnabled(!!_0x224649.sfx), Store.save();
   }, _0x3f3ed7('setSpeed').oninput = _0x2ec6c0 => {
@@ -1902,19 +1680,7 @@ function bindSettings() {
   }, _0x3f3ed7("setClimb").onchange = _0x565e1e => {
     _0x224649.climb = +_0x565e1e.target.value, Store.save(), toast(_0x224649.climb ? "🧗 抓奶娃惩罚已开启" : "😴 抓奶娃惩罚已关闭");
   };
-  let _0x1f46e3 = [];
-  _0x3f3ed7("btnTap").onclick = () => {
-    ensureCtx(), sfxClick();
-    const _0x491ff7 = performance.now();
-    _0x1f46e3 = _0x1f46e3.filter(_0x2a8c14 => _0x491ff7 - _0x2a8c14 < 0x9c4), _0x1f46e3.push(_0x491ff7);
-    if (_0x1f46e3.length >= 0x4) {
-      const _0x20b1cb = [];
-      for (let _0x3de64b = 0x1; _0x3de64b < _0x1f46e3.length; _0x3de64b++) _0x20b1cb.push(_0x1f46e3[_0x3de64b] - _0x1f46e3[_0x3de64b - 0x1]);
-      const _0x391849 = _0x20b1cb.reduce((_0x417243, _0x29d7e8) => _0x417243 + _0x29d7e8) / _0x20b1cb.length,
-        _0x3acc21 = Math.round(0xea60 / _0x391849);
-      _0x3acc21 >= 0x3c && _0x3acc21 <= 0xb4 && (_0x224649.bpm = _0x3acc21, _0x5a4cab.value = _0x3acc21, _0x3f3ed7('setBpmV').textContent = _0x3acc21, Store.save(), toast("🥁 测得 BPM ≈ " + _0x3acc21));
-    } else toast("继续点… " + _0x1f46e3.length + '/4');
-  }, _0x3f3ed7("btnReset").onclick = () => {
+  _0x3f3ed7("btnReset").onclick = () => {
     confirm('确定清空全部进度？此操作不可恢复！') && (Store.reset(), applyVolume(), renderHome(), toast('存档已清空'));
   }, initQuickScroll(), window.addEventListener("baby-climb-start", () => {
     Store.data.stats.climbCount = (Store.data.stats.climbCount || 0x0) + 0x1, Store.save();
@@ -1952,17 +1718,15 @@ export function showResult(_0x406697, _0x2225dc) {
   if (_0x406697.acc > _0x5d5cb4.bestAcc) _0x5d5cb4.bestAcc = _0x406697.acc;
   if (_0x406697.cnt.miss === 0x0 && _0x406697.cnt.perfect + _0x406697.cnt.good > 0x0) {
     _0x5d5cb4.fullCombos++;
-    if (_0x406697.diff === "hard") _0x5d5cb4.hardFc = (_0x5d5cb4.hardFc || 0x0) + 0x1;
   }
   if (_0x406697.rank === 'SS') _0x5d5cb4.ssCount++;
-  _0x406697.diff === "endless" && (_0x5d5cb4.endlessBestSec = Math.max(_0x5d5cb4.endlessBestSec || 0x0, _0x406697.sec || 0x0), _0x5d5cb4.endlessMaxRate = Math.max(_0x5d5cb4.endlessMaxRate || 0x0, Math.round((_0x406697.maxRate || 0x1) * 0xa)), _0x5d5cb4.endlessLoops = Math.max(_0x5d5cb4.endlessLoops || 0x0, _0x406697.loops || 0x0));
-  touchLoginStreak(), Store.data.coins += _0x406697.coin, Store.data.scores[_0x406697.diff] = Store.data.scores[_0x406697.diff] || [], Store.data.scores[_0x406697.diff].push({
+  Store.data.chartScores = Store.data.chartScores || {};
+  touchLoginStreak(), Store.data.coins += _0x406697.coin, Store.data.chartScores[_0x406697.songId] = Store.data.chartScores[_0x406697.songId] || [], Store.data.chartScores[_0x406697.songId].push({
     'score': _0x406697.score,
     'combo': _0x406697.maxCombo,
     'rank': _0x406697.rank,
     'date': new Date().toLocaleDateString()
-  }), Store.data.scores[_0x406697.diff].sort((_0x35425b, _0x174063) => _0x174063.score - _0x35425b.score), Store.data.scores[_0x406697.diff] = Store.data.scores[_0x406697.diff].slice(0x0, 0xa), Store.save(), document.getElementById('resRank').textContent = _0x406697.rank, document.getElementById('resScore').textContent = _0x406697.score.toLocaleString(), document.getElementById("resPerfect").textContent = _0x406697.cnt.perfect, document.getElementById("resGood").textContent = _0x406697.cnt.good, document.getElementById('resMiss').textContent = _0x406697.cnt.miss, document.getElementById("resCombo").textContent = _0x406697.maxCombo, document.getElementById("resCoin").textContent = _0x406697.coin, document.getElementById("resNew").style.display = _0x2225dc ? '' : "none", showResultQuote(_0x406697), drawReplayStrip(_0x406697.replay || [], _0x406697.sec || 0x0), renderSeasonBadge(), showScreen("scr-result"), renderHome(), renderAch();
-  if (_0x406697.diff !== "endless") {}
+  }), Store.data.chartScores[_0x406697.songId].sort((_0x35425b, _0x174063) => _0x174063.score - _0x35425b.score), Store.data.chartScores[_0x406697.songId] = Store.data.chartScores[_0x406697.songId].slice(0x0, 0xa), Store.save(), document.getElementById('resRank').textContent = _0x406697.rank, document.getElementById('resScore').textContent = _0x406697.score.toLocaleString(), document.getElementById("resPerfect").textContent = _0x406697.cnt.perfect, document.getElementById("resGood").textContent = _0x406697.cnt.good, document.getElementById('resMiss').textContent = _0x406697.cnt.miss, document.getElementById("resCombo").textContent = _0x406697.maxCombo, document.getElementById("resCoin").textContent = _0x406697.coin, document.getElementById("resNew").style.display = _0x2225dc ? '' : "none", showResultQuote(_0x406697), drawReplayStrip(_0x406697.replay || [], _0x406697.sec || 0x0), renderSeasonBadge(), showScreen("scr-result"), renderHome(), renderAch();
 }
 function drawReplayStrip(_0x5aa868, _0x4e95fe) {
   const _0x553fdb = document.getElementById("replayStrip");
@@ -2010,7 +1774,7 @@ const SEASON_TIERS = [{
 export function seasonTier() {
   const _0x3a6829 = Store.data.scores || {};
   let _0xcdeb9b = 0x0;
-  for (const _0x14a5d0 of ["easy", "normal", "hard"]) for (const _0x460d8c of _0x3a6829[_0x14a5d0] || []) _0xcdeb9b = Math.max(_0xcdeb9b, _0x460d8c.score || 0x0);
+  for (const _0x460d8c of [...Object.values(_0x3a6829), ...Object.values(Store.data.chartScores || {})].flat()) _0xcdeb9b = Math.max(_0xcdeb9b, _0x460d8c.score || 0x0);
   let _0x70e3bd = SEASON_TIERS[0x0];
   for (const _0x1407b1 of SEASON_TIERS) if (_0xcdeb9b >= _0x1407b1.min) _0x70e3bd = _0x1407b1;
   const _0x5cbd10 = new Date(),

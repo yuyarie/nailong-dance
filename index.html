@@ -81,29 +81,20 @@
     </div>
   </section>
 
-  <!-- 开跳：选歌曲 + 难度 -->
+  <!-- 开跳：选择本地谱面 -->
   <section class="screen" id="scr-play">
     <div class="play-head">
       <button class="btn-back" id="btnPlayBack">← 返回</button>
       <div class="sec-title" style="margin:0">🎵 开跳 <small>PLAY</small></div>
-      <button class="btn-custom-song" id="btnUploadSong">🎤 自定义歌曲<span>上传本地音乐 · 自动生成乐谱</span></button>
+      <button class="btn-custom-song" id="btnUploadSong">🎤 导入谱面<span>Malody 4Key · 本地谱面与音乐</span></button>
     </div>
     <div class="sec-title">🎵 选择歌曲 <small>SELECT SONG</small></div>
     
-    <input type="text" id="songSearch" class="set-input" maxlength="20" placeholder="🔍 搜歌名 / 歌手，快速定位（如：奶油）" style="width:100%;margin:2px 0 4px">
-    <div class="lvz-row" id="lvZoneRow"></div>
+    <input type="text" id="songSearch" class="set-input" maxlength="20" placeholder="🔍 搜歌名 / 歌手，快速定位" style="width:100%;margin:2px 0 4px">
     <div class="theme-grid" id="songGrid"></div>
-    <!-- 自定义歌曲列表（用户上传的，存 localStorage） -->
-    <div id="customSongs" style="display:none">
-      <div class="sec-sub">🎤 我的上传 <small>本地保存，不上服务器</small></div>
-      <div class="theme-grid" id="customSongGrid"></div>
-    </div>
-    <div class="sec-title">🔥 选择难度 <small>DIFFICULTY</small></div>
-    <div class="diff-row" id="diffRow"></div>
-    <div class="mode-row"><button class="mode-chip" id="holdChip"></button></div>
     <div class="play-foot">
       <button class="btn-main" id="btnStart">🚀 开始表演</button>
-      <div class="tip">← ↓ ↑ → 方向键 hit 箭头 · 节拍不准？去设置里校准 BPM 和延迟</div>
+      <div class="tip" id="playKeyTip">key1: D · key2: F · key3: J · key4: K · 长条按住至结束</div>
     </div>
   </section>
 
@@ -146,13 +137,7 @@
       <div class="sec-title" style="margin:0">🏆 本机纪录 <small>RANK</small></div>
     </div>
     
-    <div class="rank-tabs" id="rankTabs">
-      <button data-d="easy" class="cur">😌 热身</button>
-      <button data-d="normal">🔥 狂热</button>
-      <button data-d="hard">💀 地狱</button>
-      <button data-d="endless">♾️ 无尽</button>
-      
-    </div>
+    <div class="rank-tabs" id="rankTabs"></div>
     <div id="rankList"></div>
   </section>
 
@@ -173,22 +158,25 @@
       <select id="setSfx"><option value="1">开启</option><option value="0">关闭</option></select>
       <span class="mini-tip">判定 / 开场 / 按钮音效开关</span>
     </div>
+    <div class="set-item key-binding-settings">
+      <span class="sl">⌨️ 按键绑定</span>
+      <div class="key-bindings" id="keyBindings">
+        <button type="button" class="btn-ghost key-binding" data-key-slot="0" aria-label="修改 key1"><span>key1</span><b>D</b></button>
+        <button type="button" class="btn-ghost key-binding" data-key-slot="1" aria-label="修改 key2"><span>key2</span><b>F</b></button>
+        <button type="button" class="btn-ghost key-binding" data-key-slot="2" aria-label="修改 key3"><span>key3</span><b>J</b></button>
+        <button type="button" class="btn-ghost key-binding" data-key-slot="3" aria-label="修改 key4"><span>key4</span><b>K</b></button>
+      </div>
+      <span class="mini-tip" id="keyBindingTip" role="status">从左到右对应 key1～key4。点击按钮后按下新键，Esc 取消；键位自动保存。</span>
+    </div>
     <div class="set-item">
       <span class="sl">⏱️ 判定偏移</span>
-      <input type="range" id="setOffset" min="-200" max="200" step="10" value="0">
+      <input type="range" id="setOffset" min="-1000" max="1000" step="10" value="0">
       <span class="sv" id="setOffsetV">0ms</span>
       <span class="mini-tip">箭头总是早到就调正数，总是晚到就调负数</span>
     </div>
     <div class="set-item">
-      <span class="sl">🥁 音乐 BPM</span>
-      <input type="range" id="setBpm" min="60" max="180" step="1" value="104">
-      <span class="sv" id="setBpmV">104</span>
-      <button class="btn-ghost" id="btnTap">👆 跟着节奏点我</button>
-      <span class="mini-tip">跟着音乐鼓点连点这个按钮，自动测出 BPM（点 4 下以上生效）</span>
-    </div>
-    <div class="set-item">
       <span class="sl">🚀 箭头流速（Hi-Speed）</span>
-      <input type="range" id="setSpeed" min="0.5" max="2.0" step="0.1" value="1">
+      <input type="range" id="setSpeed" min="0.5" max="5.0" step="0.1" value="1">
       <span class="sv" id="setSpeedV">1.0×</span>
       <span class="mini-tip">只改变箭头下落快慢，不影响音乐速度。职业选手一般调到 1.2~1.5 手感最顺。</span>
     </div>
@@ -228,7 +216,7 @@
         <option value="1" selected="">开启（滑屏判定）</option>
         <option value="0">关闭（用箭头按钮）</option>
       </select>
-      <span class="mini-tip">手机上滑屏 = 方向输入，点屏幕对应位置 = 直接按轨道，长按 = 按住长条；开启后隐藏箭头按钮；电脑端始终可用方向键</span>
+      <span class="mini-tip">手机上滑屏 = 方向输入，点屏幕对应位置 = 直接按轨道，长按 = 按住长条；开启后隐藏箭头按钮；电脑端使用 key1～key4 的绑定键位</span>
     </div>
     <div class="set-item">
       <span class="sl">🧗 抓奶娃惩罚</span>
@@ -245,10 +233,9 @@
         <p>👍 <b class="rc-g">GOOD</b>：误差 ≤ 150ms，得 <b>500 分</b></p>
         <p>❌ <b class="rc-m">MISS</b>：超过 190ms 没按到，0 分并断连击（空按不惩罚）</p>
         <p>🔥 <b>连击加成</b>：每次命中额外 +10 × 当前连击数（封顶 +600）</p>
-        <p>🎹 <b>长条（钢琴块式）</b>：头部点中立刻得分并计连击 → 按住到尾自动再收一份满额尾分；提前松手按剩余比例给尾分，松得太快（不足 15%）尾分归零但不断连击</p>
+        <p>🎹 <b>谱面长条</b>：按准头部并按住至尾部，完成时按头部判定计一次得分和连击；提前超过 150ms 松开记为 MISS 并断连击</p>
         <p>🏅 <b>评级</b>（准确率 = Perfect + Good×50%）：SS ≥98% 且 0 Miss ｜ S ≥92% ｜ A ≥80% ｜ B ≥65% ｜ 其余 C</p>
         <p>🪙 <b>奶币</b> = 结算分数 ÷ 400（向下取整）</p>
-        <p>♾️ <b>无尽模式</b>：每 30 秒加速 0.1×，封顶 2×；随时退出即结算，记录保存在本机</p>
       </div>
     </div>
     
@@ -383,11 +370,11 @@
 <div id="customModal">
   <div class="cm-box card">
     <button class="cm-x" id="cmClose">✕</button>
-    <div class="cm-title">🎤 自定义歌曲</div>
-    <div class="cm-tip">上传一首本地音乐，自动分析鼓点节拍生成专属乐谱，随时单人开跳。</div>
+    <div class="cm-title">🎤 导入 Malody 谱面</div>
+    <div class="cm-tip">同时选择 .mc 谱面与谱面指定的音乐文件（可多选）。读取原谱面的 BPM、音频偏移、音符和长条，仅支持 4Key。</div>
     <div class="cm-pick-wrap">
-      <div class="cm-pick" id="cmPick">📁 选择本地音乐文件<small>支持 mp3 / wav / ogg / m4a，≤9MB，8秒~10分钟</small></div>
-      <input class="cm-file" type="file" id="fileSong" accept="audio/*">
+      <div class="cm-pick" id="cmPick">📁 选择谱面和配套音乐<small>.mc + ogg / mp3 / wav / m4a · 音乐 ≤50MB</small></div>
+      <input class="cm-file" type="file" id="fileSong" accept=".mc,.ogg,.mp3,.wav,.m4a,audio/*" multiple>
     </div>
     <div id="cmProgress"><div class="cm-prog-bar"><div class="cm-bar"></div></div><div class="cm-label">解析中…</div></div>
     <div class="cm-list" id="cmList"></div>

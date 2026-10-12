@@ -4,7 +4,8 @@ import { resolve, sep, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(process.env.PORT || 5173);
-const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.png':'image/png', '.glb':'model/gltf-binary', '.mp3':'audio/mpeg', '.json':'application/json; charset=utf-8' };
+const host = process.env.HOST || '127.0.0.1';
+const mime = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.png':'image/png', '.glb':'model/gltf-binary', '.mp3':'audio/mpeg', '.ogg':'audio/ogg', '.mc':'application/json; charset=utf-8', '.json':'application/json; charset=utf-8' };
 createServer((req, res) => {
   if (!['GET', 'HEAD'].includes(req.method)) { res.writeHead(405); res.end(); return; }
   let file;
@@ -28,4 +29,4 @@ createServer((req, res) => {
     res.writeHead(status, headers);
     if (req.method === 'HEAD') res.end(); else createReadStream(file, { start, end }).pipe(res);
   } catch { res.writeHead(404); res.end('Not found'); }
-}).listen(port, '127.0.0.1', () => console.log(`奶娃街舞本地版：http://127.0.0.1:${port}`));
+}).listen(port, host, () => console.log(`奶娃街舞本地版：http://${host}:${port}`));

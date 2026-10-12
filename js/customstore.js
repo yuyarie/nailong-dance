@@ -48,6 +48,9 @@ async function idbDel(_0x1de5de) {
   });
 }
 export const CustomStore = {
+  async saveChart(meta, dataUrl, chart) {
+    await idbPut(meta.id, { v: 2, dataUrl, chart, dur: meta.dur, name: meta.name });
+  },
   async 'save'(_0x3ce99f, _0x405062, _0x3f33ee) {
     await idbPut(_0x3ce99f.id, {
       'v': 0x1,

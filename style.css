@@ -1037,6 +1037,13 @@ body.swipeOn #stageUI.on #swipeLayer{display:block}
 @keyframes champScroll{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
 /* 涂装工坊分类标签 */
+.key-bindings{display:flex;flex-wrap:wrap;gap:10px;flex:1}
+.key-binding{display:flex;flex-direction:column;gap:6px;min-width:76px;padding:10px 14px}
+.key-binding span{font-size:12px;color:var(--sub)}
+.key-binding b{font-size:18px;color:var(--yellow)}
+.key-binding.listening{border-color:var(--pink);background:#ff3b6b22;box-shadow:0 0 16px #ff3b6b33}
+.key-binding:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+@media(max-width:600px){.key-binding-settings .key-bindings{flex-basis:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.key-binding{min-width:0;padding:10px 4px}.key-binding b{font-size:16px;overflow-wrap:anywhere}}
 .shop-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 22px}
 .shop-tab{display:flex;align-items:center;gap:10px;padding:12px 18px;border:1px solid var(--line);border-radius:14px;background:var(--glass);color:var(--sub);font:inherit;font-weight:900;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
 .shop-tab:hover{color:#fff;border-color:#ff3b6b88;background:#ff3b6b18}

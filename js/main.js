@@ -3,9 +3,9 @@ import { ensureCtx, Music, startMenuBgm, stopMenuBgm, setMenuBgmVolume, sfxClick
 import { runOpening, updateOpening, begin as _0x48e1ce, Opening } from "./opening.js";
 import { loadDancer, updateDancer, setSkin, celebrate, lieDown, resetBody, Dancer, clickBody, clickHead, setAccessory } from "./dancer.js";
 import { initFx, updateFx, Fx, burst } from "./fx.js";
-import { Game, startGame, stopGame, pauseGame, resumeGame, endGame, hitLane, releaseLane } from "./game.js";
+import { Game, startGame, stopGame, pauseGame, resumeGame, hitLane, releaseLane } from "./game.js";
 import { SKINS, SONGS, initUI, showUIRoot, showStageUI, showScreen, showResult, checkAch, toast, renderHome, Store } from "./ui.js";
-import { buildCustomNotes } from "./chartgen.js";
+
 import "./customstore.js";
 const $ = _0xcb6813 => document.getElementById(_0xcb6813),
   renderer = new THREE.WebGLRenderer({
@@ -89,9 +89,9 @@ addEventListener('dancer-progress', _0x1234b6 => {
   const _0x106f0b = _0x1234b6.detail;
   $("loadBar").style.width = 0x5 + _0x106f0b * 0.55 + '%', $("loadSub").textContent = '舞者模型下载中\x20' + _0x106f0b + '%';
 });
-Music.el.addEventListener("canplaythrough", () => console.log("[启动] ✓ 背景音乐 music.mp3 已就绪"), {
+Music.el.addEventListener("canplaythrough", () => console.log("[启动] ✓ 背景音乐 默认曲目 已就绪"), {
   'once': true
-}), Music.el.addEventListener("error", () => console.warn('[启动]\x20⚠\x20背景音乐\x20music.mp3\x20加载失败，游戏可照常进行'), {
+}), Music.el.addEventListener("error", () => console.warn('[启动]\x20⚠\x20背景音乐\x20默认曲目\x20加载失败，游戏可照常进行'), {
   'once': true
 });
 const main = {
@@ -108,33 +108,29 @@ const main = {
     let _0x3c25dd = _0x2f98ce >= 0x3 ? Math.min(devicePixelRatio, 0x3) : _0x2f98ce >= 0x2 ? Math.min(devicePixelRatio, 0x2) : _0x2f98ce >= 0x1 ? Math.min(devicePixelRatio, 1.5) : _0x2f98ce;
     renderer.setPixelRatio(_0x3c25dd);
   },
-  async 'startShow'(_0x3d3c2a, _0x1afe4d, _0x2ca837, _0x12a688, _0x55fb37) {
-    ensureCtx(), stopMenuBgm();
-    const _0x474902 = _0x2ca837 ? null : SONGS.find(_0x56d729 => _0x56d729.id === _0x1afe4d) || SONGS[0x0];
-    _0x2ca837 ? Music.setSong(_0x2ca837) : Music.setSong(_0x474902.file);
-    const _0x4faf71 = Store.data.set,
-      _0xad8b80 = _0x12a688 || _0x474902?.["bpm"] || _0x4faf71.bpm;
-    showUIRoot(false), showStageUI(true), camera.position.copy(CAM_PLAY), Fx.camBase.copy(CAM_PLAY), resetBody(), Game.hooks.onEnd = onShowEnd, Game.hooks.onScore = null, Game.hooks.onJudge = null, Game.hooks.onSwap = null, document.getElementById('btnPause').style.display = '';
-    const _0x5f230c = await Music.awaitDuration(0xbb8),
-      _0x5b34ca = _0x2ca837 && _0x55fb37 && _0x55fb37.length ? buildCustomNotes(_0x55fb37, _0x3d3c2a, _0x1afe4d) : null;
-    startGame({
-      'diff': _0x3d3c2a,
-      'bpm': _0xad8b80,
-      'offset': _0x4faf71.offset,
-      'speed': _0x4faf71.speed,
-      'duration': _0x5f230c,
-      'songId': _0x474902 ? _0x474902.id : _0x1afe4d || "custom",
-      'hold': _0x4faf71.hold ? 0x1 : 0x0,
-      'rate': _0x3d3c2a === 'endless' ? 0x1 : undefined,
-      'customNotes': _0x5b34ca
-    }), startStallWatch();
+  async startShow(song, audio, chart) {
+    ensureCtx();
+    Music.setSong(audio);
+    const duration = await Music.awaitDuration();
+    if (Music.el.error || !Number.isFinite(Music.el.duration) || chart.endTime > duration + 0.2) {
+      throw new Error('音乐加载失败或谱面超出音乐时长，请检查配套文件');
+    }
+    stopMenuBgm();
+    const settings = Store.data.set;
+    showUIRoot(false); showStageUI(true); camera.position.copy(CAM_PLAY); Fx.camBase.copy(CAM_PLAY);
+    resetBody(); Game.hooks.onEnd = onShowEnd; Game.hooks.onScore = null;
+    Game.hooks.onJudge = null; Game.hooks.onSwap = null;
+    document.getElementById('btnPause').style.display = '';
+    startGame({ diff: 'chart', bpm: chart.bpm, timing: chart.timing,
+      offset: settings.offset, speed: settings.speed, duration, songId: song.id,
+      customNotes: chart.notes });
+    startStallWatch();
   },
   'resume'() {
     resumeGame(), $("pauseOv").classList.remove('on');
   },
   'quitShow'() {
     stopStallWatch();
-    if (Game.endless && Game.playing) return endGame(), true;
     return stopGame(false), resetBody(), this.applyQuality(Store.data.set.quality), showStageUI(false), showUIRoot(true), camera.position.copy(CAM_HOME), Fx.camBase.copy(CAM_HOME), startMenuBgm(), false;
   }
 };
@@ -183,21 +179,12 @@ function onShowEnd(_0x418ca4) {
   if (_0x418ca4.acc >= 0.8) celebrate();else lieDown();
   showUIRoot(true), startMenuBgm(), setTimeout(() => sfxEndVoice(), 0x1f4);
 }
-const KEYMAP = {
-  'ArrowLeft': 0x0,
-  'ArrowDown': 0x1,
-  'ArrowUp': 0x2,
-  'ArrowRight': 0x3,
-  'KeyA': 0x0,
-  'KeyS': 0x1,
-  'KeyW': 0x2,
-  'KeyD': 0x3
-};
 addEventListener('keydown', _0x2c1b43 => {
   if (Game.playing) {
-    if (_0x2c1b43.code in KEYMAP) {
+    const lane = Store.data.set.keys.indexOf(_0x2c1b43.code);
+    if (lane !== -1) {
       _0x2c1b43.preventDefault();
-      if (!_0x2c1b43.repeat) hitLane(KEYMAP[_0x2c1b43.code]);
+      if (!_0x2c1b43.repeat) hitLane(lane);
     } else {
       if (_0x2c1b43.code === 'Escape' || _0x2c1b43.code === "KeyP") {
         _0x2c1b43.preventDefault();
@@ -206,7 +193,8 @@ addEventListener('keydown', _0x2c1b43 => {
     }
   }
 }), addEventListener("keyup", _0x3d3146 => {
-  if (Game.playing && _0x3d3146.code in KEYMAP) relLane(KEYMAP[_0x3d3146.code]);
+  const lane = Store.data.set.keys.indexOf(_0x3d3146.code);
+  if (Game.playing && lane !== -1) relLane(lane);
 });
 const _pressT = [0x0, 0x0, 0x0, 0x0];
 function pressLane(_0x4bb0a2, _0x1f0659) {
@@ -494,7 +482,7 @@ function loop() {
     return;
   }
   const _0xdd337d = Game.playing && !Game.paused,
-    _0x4ea01f = Store.data.set.bpm;
+    _0x4ea01f = Game.playing ? (Game.cfg.timing.filter(point => point.t <= Music.time()).at(-1)?.bpm || Game.cfg.bpm) : 174;
   updateDancer(_0x3c824d, _0x4ea01f, _0xdd337d);
   let _0x124ff6 = false;
   if (Game.playing) {

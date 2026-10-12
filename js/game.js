@@ -26,153 +26,16 @@ export const Game = {
   '_raf': 0x0,
   '_lastY': 0x0
 };
-function mulberry32(_0x4fcd92) {
-  return function () {
-    _0x4fcd92 |= 0x0, _0x4fcd92 = _0x4fcd92 + 0x6d2b79f5 | 0x0;
-    let _0x2e8fd9 = Math.imul(_0x4fcd92 ^ _0x4fcd92 >>> 0xf, 0x1 | _0x4fcd92);
-    return _0x2e8fd9 = _0x2e8fd9 + Math.imul(_0x2e8fd9 ^ _0x2e8fd9 >>> 0x7, 0x3d | _0x2e8fd9) ^ _0x2e8fd9, ((_0x2e8fd9 ^ _0x2e8fd9 >>> 0xe) >>> 0x0) / 0x100000000;
-  };
-}
-function strSeed(_0x599794) {
-  let _0x49ac68 = 0x811c9dc5;
-  for (let _0x26f322 = 0x0; _0x26f322 < _0x599794.length; _0x26f322++) {
-    _0x49ac68 ^= _0x599794.charCodeAt(_0x26f322), _0x49ac68 = Math.imul(_0x49ac68, 0x1000193);
-  }
-  return _0x49ac68 >>> 0x0;
-}
-export function genChart(_0x43c6d3, _0x1818a2, _0xbb09bb, _0x452e01, _0x4fa17a = '', _0x34d18d = 0x0) {
-  const _0x34ef93 = mulberry32(strSeed((_0x4fa17a || 'x') + _0x43c6d3)),
-    _0x479094 = 0x3c / _0x1818a2,
-    _0x48e91c = Math.max(1.2, _0x452e01 + _0x479094 * 0x4),
-    _0x566a10 = Math.max(_0x48e91c + 0x4, _0xbb09bb - 1.6),
-    _0x442454 = [],
-    _0x3008a8 = {
-      'easy': {
-        'div': 0x1,
-        'rest': 0.25,
-        'dbl': 0x0,
-        'burst': 0x0
-      },
-      'normal': {
-        'div': 0x2,
-        'rest': 0.1,
-        'dbl': 0.07,
-        'burst': 0x0
-      },
-      'hard': {
-        'div': 0x2,
-        'rest': 0.03,
-        'dbl': 0.14,
-        'burst': 0.05
-      },
-      'endless': {
-        'div': 0x2,
-        'rest': 0.12,
-        'dbl': 0.08,
-        'burst': 0x0
-      }
-    }[_0x43c6d3],
-    _0x21612c = _0x34d18d ? {
-      'easy': 0.12,
-      'normal': 0.14,
-      'hard': 0.1
-    }[_0x43c6d3] ?? 0.12 : 0x0;
-  let _0x4f96d8 = _0x34ef93() * 0x4 | 0x0;
-  for (let _0xfef3dd = _0x48e91c; _0xfef3dd < _0x566a10; _0xfef3dd += _0x479094 / _0x3008a8.div) {
-    if (_0x34ef93() < _0x3008a8.rest) continue;
-    const _0x4eba7e = {
-      't': _0xfef3dd,
-      'lane': _0x4f96d8,
-      'state': 0x0
-    };
-    if (_0x21612c && _0x34ef93() < _0x21612c && _0xfef3dd + _0x479094 * 0x3 < _0x566a10) _0x4eba7e.len = _0x479094 * (0.6 + _0x34ef93() * 0.5);
-    _0x442454.push(_0x4eba7e);
-    if (_0x34ef93() < _0x3008a8.dbl) {
-      const _0x5d51b5 = (_0x4f96d8 + 0x1 + (_0x34ef93() * 0x3 | 0x0)) % 0x4;
-      _0x442454.push({
-        't': _0xfef3dd,
-        'lane': _0x5d51b5,
-        'state': 0x0
-      });
-    }
-    if (_0x34ef93() < _0x3008a8.burst) {
-      const _0x14a715 = (_0x4f96d8 + 0x1) % 0x4,
-        _0x34e27d = (_0x4f96d8 + 0x2) % 0x4;
-      _0x442454.push({
-        't': _0xfef3dd + _0x479094 / 0x4,
-        'lane': _0x14a715,
-        'state': 0x0
-      }), _0x442454.push({
-        't': _0xfef3dd + _0x479094 / 0x2,
-        'lane': _0x34e27d,
-        'state': 0x0
-      });
-    }
-    _0x4f96d8 = _0x43c6d3 === "endless" || _0x34ef93() < 0.7 ? (_0x4f96d8 + 0x1 + (_0x34ef93() * 0x3 | 0x0)) % 0x4 : _0x4f96d8;
-  }
-  if (_0x21612c) {
-    _0x442454.sort((_0x278728, _0x3be703) => _0x278728.t - _0x3be703.t);
-    const _0x57a6ef = [-0x9, -0x9, -0x9, -0x9];
-    return _0x442454.filter(_0x6c9fe6 => {
-      if (_0x6c9fe6.t < _0x57a6ef[_0x6c9fe6.lane]) return false;
-      if (_0x6c9fe6.len) _0x57a6ef[_0x6c9fe6.lane] = _0x6c9fe6.t + _0x6c9fe6.len;
-      return true;
-    });
-  }
-  return _0x442454;
-}
-export function genSwapWindows(_0x41b0f9, _0x343d37, _0x587ed2) {
-  if (_0x343d37 < 0x2 || _0x587ed2 < 0x5a) return [];
-  const _0x4d38c3 = mulberry32(strSeed(String(_0x41b0f9) + ":swap")),
-    _0x5b6964 = [];
-  let _0x84b921 = 0x14 + _0x4d38c3() * 0x28;
-  while (_0x5b6964.length < 0x4) {
-    const _0xa96aa3 = 0x8 + _0x4d38c3() * 0x4;
-    if (_0x84b921 + _0xa96aa3 > _0x587ed2 - 0xc) break;
-    _0x5b6964.push({
-      't0': _0x84b921,
-      't1': _0x84b921 + _0xa96aa3,
-      'shift': 0x1 + (_0x4d38c3() * (_0x343d37 - 0x1) | 0x0)
-    }), _0x84b921 += _0xa96aa3 + 0x14 + _0x4d38c3() * 0x28;
-  }
-  return _0x5b6964.length >= 0x2 ? _0x5b6964 : [];
-}
 export function startGame(_0x31baf3) {
-  stopGame(true), Game.cfg = _0x31baf3, Game.endless = _0x31baf3.diff === "endless";
-  const _0x400bd7 = Game.endless ? Infinity : _0x31baf3.loops | 0x0 || 0x1;
-  Game.loops = _0x400bd7, Game.loopsDone = 0x0, Game._lastT = 0x0;
-  let _0x357b50;
-  if (_0x31baf3.customNotes) {
-    const _0x3fc335 = _0x31baf3.customNotes;
-    if (!Game.endless && _0x400bd7 > 0x1) {
-      _0x357b50 = [];
-      for (let _0xac0efd = 0x0; _0xac0efd < _0x400bd7; _0xac0efd++) for (const _0x118fff of _0x3fc335) _0x357b50.push({
-        't': _0x118fff.t + _0xac0efd * _0x31baf3.duration,
-        'lane': _0x118fff.lane,
-        'state': 0x0
-      });
-    } else _0x357b50 = _0x3fc335.map(_0x4ac751 => ({
-      't': _0x4ac751.t,
-      'lane': _0x4ac751.lane,
-      'state': 0x0
-    }));
-  } else _0x357b50 = genChart(_0x31baf3.diff, _0x31baf3.bpm, _0x31baf3.duration * (Game.endless ? 0x1 : _0x400bd7), _0x31baf3.offset / 0x3e8, _0x31baf3.songId || '', _0x31baf3.hold ? 0x1 : 0x0);
-  Game.activeLanes = null, Game._swapOn = false;
-  if (_0x31baf3.share) {
-    const _0x5ce5c9 = mulberry32(strSeed((_0x31baf3.songId || 'x') + _0x31baf3.diff + ':' + _0x31baf3.share.seed)),
-      _0x9bf7eb = Math.max(0x1, _0x31baf3.share.n | 0x0),
-      _0xe91215 = _0x31baf3.share.idx | 0x0,
-      _0x2dde25 = _0x31baf3.swapWindows || [];
-    _0x357b50 = _0x357b50.filter(_0x42d843 => {
-      const _0x314b93 = _0x5ce5c9() * _0x9bf7eb | 0x0;
-      let _0x4d4b75 = _0x314b93;
-      for (const _0x30d841 of _0x2dde25) if (_0x42d843.t >= _0x30d841.t0 && _0x42d843.t < _0x30d841.t1) {
-        _0x4d4b75 = (_0x314b93 + _0x30d841.shift) % _0x9bf7eb;
-        break;
-      }
-      return _0x4d4b75 === _0xe91215;
-    });
-  }
+  if (!_0x31baf3.customNotes?.length) throw new Error('没有可运行的 4Key 谱面');
+  stopGame(true); Game.cfg = _0x31baf3; Game.endless = false;
+  Game.loops = 1; Game.loopsDone = 0;
+  const _0x357b50 = _0x31baf3.customNotes.map(note => ({
+    t: note.t + (_0x31baf3.offset || 0) / 1000, lane: note.lane, len: note.len || 0, state: 0
+  }));
+  Game.activeLanes = null; Game._swapOn = false;
+  Game._audioStarted = false;
+  Game._startAudioAt = performance.now() + Math.max(0, 1.5 - _0x357b50[0].t) * 1000;
   Game.notes = _0x357b50, Game.score = 0x0, Game.combo = 0x0, Game.maxCombo = 0x0, Game.cnt = {
     'perfect': 0x0,
     'good': 0x0,
@@ -185,7 +48,10 @@ export function startGame(_0x31baf3) {
   }), Music.el.playbackRate = _0x31baf3.rate || 0x1;
   const _0x349b26 = document.getElementById("hudRate");
   if (_0x349b26) _0x349b26.textContent = _0x31baf3.rate ? '×' + Number(_0x31baf3.rate).toFixed(0x1) : '';
-  _0x400bd7 > 0x1 ? (Music.el.loop = true, Music.el.onended = null) : (Music.el.loop = false, Music.el.onended = () => finishGame(true)), console.log("%c[演出] 🎬 开始！难度=" + _0x31baf3.diff + " BPM=" + _0x31baf3.bpm + '\x20音符数=' + Game.notes.length + '\x20时长≈' + _0x31baf3.duration.toFixed(0x0) + 's×' + _0x400bd7 + "遍 倍速×" + (_0x31baf3.rate || 0x1), "color:#ffe17a;font-weight:bold"), Music.play(), loop();
+  Music.el.loop = false;
+  Music.el.onended = () => finishGame(true);
+  console.log('[演出] Malody 4Key · ' + Game.notes.length + ' notes · BPM ' + _0x31baf3.bpm);
+  loop();
 }
 function spawnNoteEl(_0x1f58f4, _0x4bde6d) {
   const _0x3f36b3 = document.createElement("div");
@@ -198,11 +64,15 @@ function spawnNoteEl(_0x1f58f4, _0x4bde6d) {
 }
 export function pauseGame() {
   if (!Game.playing || Game.paused) return;
-  Game.paused = true, Music.pause();
+  Game._preRollRemaining = Math.max(0, Game._startAudioAt - performance.now());
+  Game.paused = true; Music.pause();
 }
 export function resumeGame() {
   if (!Game.playing || !Game.paused) return;
-  Game.paused = false, Music.play();
+  Game.paused = false;
+  if (Game._audioStarted) Music.play();
+  else Game._startAudioAt = performance.now() + Game._preRollRemaining;
+  for (const note of Game.notes) if (note.state === 3 && note.releasedDuringPause) finishHold(note, 0);
 }
 export function stopGame(_0xa418e1) {
   Game.playing = false, Game.paused = false, Game.activeLanes = null, Game._swapOn = false, Game.loops = 0x1, Game.loopsDone = 0x0, Game.endless = false, cancelAnimationFrame(Game._raf), Music.stop(), Music.el.onended = null, Music.el.loop = false, Music.el.playbackRate = 0x1, document.querySelectorAll(".lane.dim,.receptor.dim").forEach(_0x33cbd6 => _0x33cbd6.classList.remove("dim")), !_0xa418e1 && (document.getElementById("stageUI").classList.remove('on'), document.getElementById("noteTilt").querySelectorAll(".note").forEach(_0x3d1125 => _0x3d1125.remove()));
@@ -214,42 +84,10 @@ function loop() {
   if (!Game.playing) return;
   Game._raf = requestAnimationFrame(loop);
   if (Game.paused) return;
-  const _0x218a7b = Music.time();
-  if (Game.loops > 0x1) {
-    if (_0x218a7b < Game._lastT - 0x2) {
-      Game.loopsDone++;
-      if (Game.loopsDone >= Game.loops) {
-        finishGame(true);
-        return;
-      }
-      if (Game.endless) for (const _0x468246 of Game.notes) {
-        _0x468246.state = 0x0, _0x468246.holdQ = null, _0x468246.el && (_0x468246.el.remove(), _0x468246.el = null), spawnNoteEl(_0x468246, Game.cfg.speed);
-      }
-    }
-    Game._lastT = _0x218a7b;
+  if (!Game._audioStarted && performance.now() >= Game._startAudioAt) {
+    Game._audioStarted = true; Music.play();
   }
-  const _0x52a8d1 = _0x218a7b + (Game.loopsDone || 0x0) * (Game.cfg.duration || 0x0),
-    _0x3c4b42 = Game.endless ? _0x218a7b : _0x52a8d1;
-  if (Game.cfg.rate) {
-    const _0x3d6314 = Math.min(0x2, Game.cfg.rate + Math.floor(_0x52a8d1 / 0x1e) * 0.1);
-    if (_0x3d6314 !== Music.el.playbackRate) {
-      Music.el.playbackRate = _0x3d6314;
-      const _0x4de28f = document.getElementById("hudRate");
-      if (_0x4de28f) _0x4de28f.textContent = '×' + _0x3d6314.toFixed(0x1);
-    }
-    Game.maxRate = Math.max(Game.maxRate || 0x1, _0x3d6314);
-  }
-  const _0x41b7c6 = Game.cfg.swapWindows;
-  if (_0x41b7c6 && _0x41b7c6.length) {
-    let _0x30feb5 = false;
-    for (const _0x4b34f1 of _0x41b7c6) {
-      if (_0x3c4b42 >= _0x4b34f1.t0 && _0x3c4b42 < _0x4b34f1.t1) {
-        _0x30feb5 = true;
-        break;
-      }
-    }
-    if (_0x30feb5 && !Game._swapOn) Game._swapOn = true, Game.hooks.onSwap && Game.hooks.onSwap(true);else !_0x30feb5 && Game._swapOn && (Game._swapOn = false, Game.hooks.onSwap && Game.hooks.onSwap(false));
-  }
+  const _0x3c4b42 = gameTime();
   const _0x4ab6ad = 0x154 * Game.cfg.speed,
     _0x8afffa = () => document.getElementById('hitLine').offsetTop;
   for (const _0x256dea of Game.notes) {
@@ -269,19 +107,22 @@ function loop() {
     }
     if (_0x119014 > 1.4) break;
     const _0x333e2c = _0x8afffa() - _0x119014 * _0x4ab6ad - 0x1a;
-    if (_0x119014 > 0.9) {
+    if (_0x333e2c < -52) {
       _0x256dea.el.style.display = "none";
       continue;
     }
     if (_0x256dea.el.style.display === "none") _0x256dea.el.style.display = '';
     _0x256dea.el.style.transform = "translateY(" + _0x333e2c + "px)";
-    if (_0x119014 < -WIN_MISS) judge(_0x256dea, 'miss', 0x0);
+    if (_0x119014 < -WIN_MISS) judge(_0x256dea, 'miss', _0x256dea.lane);
   }
+}
+export function gameTime() {
+  return Game._audioStarted ? Music.time() : -Math.max(0, Game.paused ? Game._preRollRemaining : Game._startAudioAt - performance.now()) / 1000;
 }
 export function hitLane(_0x50da15, _0x22fb9c) {
   if (!Game.playing || Game.paused) return;
   if (Game.activeLanes && !Game.activeLanes.includes(_0x50da15)) return;
-  const _0x4741c5 = Game.endless ? Music.time() : Music.time() + (Game.loopsDone || 0x0) * (Game.cfg && Game.cfg.duration || 0x0);
+  const _0x4741c5 = gameTime();
   let _0x51b289 = null,
     _0x59fafa = 0x3b9aca00;
   for (const _0x120cf4 of Game.notes) {
@@ -290,7 +131,7 @@ export function hitLane(_0x50da15, _0x22fb9c) {
     _0x2c0215 < _0x59fafa && (_0x59fafa = _0x2c0215, _0x51b289 = _0x120cf4);
     if (_0x120cf4.t - _0x4741c5 > 0.4) break;
   }
-  if (!_0x51b289 || _0x59fafa > WIN_MISS) {
+  if (!_0x51b289 || _0x59fafa > WIN_GOOD) {
     receptorPop(_0x50da15, false);
     return;
   }
@@ -299,7 +140,7 @@ export function hitLane(_0x50da15, _0x22fb9c) {
     if (_0x51b289.el) _0x51b289.el.classList.add("holding");
     receptorPop(_0x50da15, true);
     const _0x30d123 = '#' + LANE_HEX[_0x50da15].toString(0x10).padStart(0x6, '0');
-    laneFlash(_0x50da15, _0x30d123), Game.cnt[_0x51b289.holdQ]++, Game.combo++, Game.maxCombo = Math.max(Game.maxCombo, Game.combo), Game.score += (_0x51b289.holdQ === "perfect" ? 0x3e8 : 0x1f4) + Math.min(Game.combo, 0x3c) * 0xa, doAction(_0x50da15, _0x51b289.holdQ), _0x51b289.holdQ === "perfect" ? sfxPerfect() : sfxGood(), floatText(_0x50da15, _0x51b289.holdQ === "perfect" ? "PERFECT!" : "GOOD", _0x51b289.holdQ === 'perfect' ? "#4fe3ff" : "#ffe17a", timingSub(_0x51b289.t - _0x4741c5)), Game.hooks.onJudge && Game.hooks.onJudge({
+    laneFlash(_0x50da15, _0x30d123), doAction(_0x50da15, _0x51b289.holdQ), _0x51b289.holdQ === "perfect" ? sfxPerfect() : sfxGood(), floatText(_0x50da15, _0x51b289.holdQ === "perfect" ? "PERFECT!" : "GOOD", _0x51b289.holdQ === 'perfect' ? "#4fe3ff" : "#ffe17a", timingSub(_0x51b289.t - _0x4741c5)), Game.hooks.onJudge && Game.hooks.onJudge({
       'lane': _0x50da15,
       'q': _0x51b289.holdQ
     });
@@ -308,8 +149,12 @@ export function hitLane(_0x50da15, _0x22fb9c) {
   judge(_0x51b289, _0x59fafa <= WIN_PERFECT ? "perfect" : "good", _0x50da15, 0x1, _0x59fafa <= WIN_PERFECT ? 'perfect' : "good", _0x51b289.t - _0x4741c5);
 }
 export function releaseLane(_0x5193af) {
-  if (!Game.playing || Game.paused) return;
-  const _0x17644a = Game.endless ? Music.time() : Music.time() + (Game.loopsDone || 0x0) * (Game.cfg && Game.cfg.duration || 0x0);
+  if (!Game.playing) return;
+  if (Game.paused) {
+    for (const note of Game.notes) if (note.state === 3 && note.lane === _0x5193af) note.releasedDuringPause = true;
+    return;
+  }
+  const _0x17644a = gameTime();
   for (const _0x4f47e2 of Game.notes) {
     if (_0x4f47e2.state !== 0x3 || _0x4f47e2.lane !== _0x5193af) continue;
     const _0x36ade3 = Math.max(0x0, Math.min(0x1, (_0x17644a - _0x4f47e2.t) / (_0x4f47e2.end - _0x4f47e2.t)));
@@ -317,21 +162,9 @@ export function releaseLane(_0x5193af) {
     return;
   }
 }
-function finishHold(_0x40a3e6, _0x332605) {
-  const _0x30c07d = Math.round((_0x40a3e6.holdQ === "perfect" ? 0x3e8 : 0x1f4) * _0x332605);
-  _0x40a3e6.state = 0x1;
-  const _0x2f87aa = _0x40a3e6.el;
-  _0x2f87aa && (_0x40a3e6.el = null, _0x2f87aa.classList.add("gone"), setTimeout(() => _0x2f87aa.remove(), 0xc8), _0x30c07d > 0x0 && (Game.score += _0x30c07d, receptorPop(_0x40a3e6.lane, true), laneFlash(_0x40a3e6.lane, LANE_HEX[_0x40a3e6.lane]), ringPulse((_0x40a3e6.lane - 1.5) * 0.95, 1.7, LANE_HEX[_0x40a3e6.lane]), floatText(_0x40a3e6.lane, _0x332605 >= 0.9 ? 'PERFECT!' : Math.round(_0x332605 * 0x64) + '%', _0x332605 >= 0.9 ? "#4fe3ff" : "#ffe17a"), burst(new THREE.Vector3((_0x40a3e6.lane - 1.5) * 0.6, 1.1, 0.4), LANE_HEX[_0x40a3e6.lane], 0x12))), updateHud(), Game.hooks.onJudge && Game.hooks.onJudge({
-    'lane': _0x40a3e6.lane,
-    'q': _0x40a3e6.holdQ
-  }), Game.hooks.onScore && Game.hooks.onScore({
-    'score': Game.score,
-    'combo': Game.combo,
-    'maxCombo': Game.maxCombo,
-    'perfect': Game.cnt.perfect,
-    'good': Game.cnt.good,
-    'miss': Game.cnt.miss
-  });
+function finishHold(note, fraction) {
+  // A hold has one judgement: releasing too early breaks it rather than granting a partial pass.
+  judge(note, fraction >= 1 ? note.holdQ : 'miss', note.lane);
 }
 function judge(_0x9ffea9, _0x47b2be, _0xae5322, _0x404031 = 0x1, _0x36a4a0 = _0x47b2be, _0x33f912 = null) {
   _0x9ffea9.state = _0x47b2be === 'miss' ? 0x2 : 0x1;
@@ -425,7 +258,12 @@ function updateHud() {
 }
 function finishGame(_0x130771) {
   if (!Game.playing) return;
-  Game.playing = false, cancelAnimationFrame(Game._raf), Music.stop();
+  const endedAt = gameTime();
+  for (const note of Game.notes) {
+    if (note.state === 0) judge(note, 'miss', note.lane);
+    else if (note.state === 3) finishHold(note, endedAt >= note.end - WIN_GOOD ? 1 : 0);
+  }
+  Game.playing = false; cancelAnimationFrame(Game._raf); Music.stop();
   const _0x531c73 = Game.cnt.perfect + Game.cnt.good + Game.cnt.miss,
     _0x57e258 = _0x531c73 ? (Game.cnt.perfect + Game.cnt.good * 0.5) / _0x531c73 : 0x0;
   let _0x44afef = 'C';
@@ -437,7 +275,7 @@ function finishGame(_0x130771) {
     }
   }
   const _0x4f09bb = Math.floor(Game.score / 0x190),
-    _0x3e8119 = Math.round((Music.time() || 0x0) + (Game.loopsDone || 0x0) * (Game.cfg && Game.cfg.duration || 0x0));
+    _0x3e8119 = Math.round(endedAt);
   Game.hooks.onEnd && Game.hooks.onEnd({
     'score': Game.score,
     'maxCombo': Game.maxCombo,

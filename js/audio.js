@@ -133,13 +133,13 @@ const music = new Audio(),
   shortSrc = _0x2c58da => {
     return _0x2c58da = String(_0x2c58da || ''), /^data:/.test(_0x2c58da) ? _0x2c58da.slice(0x0, 0x20) + '…(' + _0x2c58da.length + "字符)" : _0x2c58da;
   };
-music.src = "music.mp3", music.preload = "auto", music.loop = false, music.addEventListener('error', () => {
+music.src = "charts/default/1565767011.ogg", music.preload = "auto", music.loop = false, music.addEventListener('error', () => {
   const _0x2fd04c = music.error;
   console.log("%c[音乐] ❌ error! code=" + (_0x2fd04c ? _0x2fd04c.code : '?') + '\x20src=' + shortSrc(music.src) + " currentSrc=" + shortSrc(music.currentSrc), "color:#ff4d4d;font-weight:bold");
 }), window.__music = music;
 export const Music = {
   'el': music,
-  'currentSong': 'music.mp3',
+  'currentSong': 'charts/default/1565767011.ogg',
   'setSong'(_0x20118b) {
     this.currentSong = _0x20118b;
     try {
