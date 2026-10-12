@@ -1,0 +1,1 @@
+{"name":"nailong-dance-local","version":"1.0.0","private":true,"type":"module","description":"奶娃街舞：本地纯前端开发版本","scripts":{"start":"node server.mjs","dev":"node server.mjs"},"engines":{"node":">=20"}}

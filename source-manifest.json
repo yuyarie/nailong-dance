@@ -1,0 +1,265 @@
+{
+  "savedOn": "2026-10-12",
+  "sourceSite": "https://nailong-dance.pages.dev/",
+  "note": "Local files adapted to remove online features; hashes describe the local version.",
+  "files": [
+    {
+      "path": ".gitignore",
+      "source": null,
+      "sha256": "97475deaaf69cc533b293e8dfba7207ba123b257c2618f60392eeae4cbf8394c",
+      "bytes": 31
+    },
+    {
+      "path": "baby.png",
+      "source": "https://nailong-dance.pages.dev/baby.png",
+      "sha256": "e3cc0af755366044178cb51e8107a62c89eb28fe86df427f633f8501cb26f921",
+      "bytes": 258923
+    },
+    {
+      "path": "baby1.glb",
+      "source": "https://nailong-dance.pages.dev/baby1.glb",
+      "sha256": "ff03552baa92d863ef862383b9b7ce7357b7b4bb3c20e23135e459e38413b07a",
+      "bytes": 759252
+    },
+    {
+      "path": "baby2.glb",
+      "source": "https://nailong-dance.pages.dev/baby2.glb",
+      "sha256": "de67e49f68dd8b70535ffed459ef50d4a16d37f9a256351cae5237b4dc2996e0",
+      "bytes": 719580
+    },
+    {
+      "path": "gifts/bee.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/bee.glb",
+      "sha256": "9d3116da6c22eabf0b46efeeec7fceae8fbd01e101fddd4e6746379ff851e192",
+      "bytes": 164356
+    },
+    {
+      "path": "gifts/bunny.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/bunny.glb",
+      "sha256": "94b654915d9de70071bcf0bfa13de379a3ba4fdfeb231f0fec49335232cbc821",
+      "bytes": 131568
+    },
+    {
+      "path": "gifts/cat.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/cat.glb",
+      "sha256": "1e73aaf7d497dd7d2946badf92d189d2333f163e66dced91feb446bc9bdee850",
+      "bytes": 165164
+    },
+    {
+      "path": "gifts/chick.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/chick.glb",
+      "sha256": "86dd5f030c9341486313b35b9e827500c430274a83b5d683cab5b1f55bc1024d",
+      "bytes": 125424
+    },
+    {
+      "path": "gifts/donut-sprinkles.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/donut-sprinkles.glb",
+      "sha256": "f45946b7e81221e9d45fdfab45ee89eeb095ff0d7fb6a3ad9988919cf587d3b7",
+      "bytes": 20008
+    },
+    {
+      "path": "gifts/grapes.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/grapes.glb",
+      "sha256": "4ea095cc74bbea4215b4e1a35a95af0b6997b9290091a2babc480ad6840ea5b2",
+      "bytes": 58992
+    },
+    {
+      "path": "gifts/ice-cream-cne.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/ice-cream-cne.glb",
+      "sha256": "13500e2c169ecf113ff525a9d414bbf034e2103962da9b8195128ff960194b6c",
+      "bytes": 5460
+    },
+    {
+      "path": "gifts/lollypop.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/lollypop.glb",
+      "sha256": "b7bc189eca2aedcfe24445de9ec01a2fd4812caafcbe2f718b6b7f10e031a1a3",
+      "bytes": 8544
+    },
+    {
+      "path": "gifts/muffin.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/muffin.glb",
+      "sha256": "396184e9d82e79582858569d68ba5d05640838bc514e952556b9ee044a0e7f87",
+      "bytes": 10252
+    },
+    {
+      "path": "gifts/pancakes.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/pancakes.glb",
+      "sha256": "75550fb0eae1169ce4f59b054b0bbaa3de3be67765cd457a7e3e99488e93546e",
+      "bytes": 42592
+    },
+    {
+      "path": "gifts/popsicle.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/popsicle.glb",
+      "sha256": "c599de8f09da9251563c660d5d2e41719e1654ea662b2a33f0da98d9501d6dff",
+      "bytes": 8116
+    },
+    {
+      "path": "gifts/strawberry.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/strawberry.glb",
+      "sha256": "685828642a92681b474c29abbd9cabe98c7bcade62cc50da57ec6658a5b7e8f7",
+      "bytes": 16620
+    },
+    {
+      "path": "gifts/Textures/colormap.png",
+      "source": "https://nailong-dance.pages.dev/gifts/Textures/colormap.png",
+      "sha256": "75baf74d9483a0fc56ac21ceba346fbe16fc24a2a1bf0524c53e6bbe802e1153",
+      "bytes": 10715
+    },
+    {
+      "path": "gifts/watermelon.glb",
+      "source": "https://nailong-dance.pages.dev/gifts/watermelon.glb",
+      "sha256": "5992fa8ea001949b01a5e2b035693b885146c575f740e5c4505532c4e7e6f1ba",
+      "bytes": 93884
+    },
+    {
+      "path": "index.html",
+      "source": "https://nailong-dance.pages.dev/",
+      "sha256": "6498c8317866f854c18481227b0bd4e913a3e1bd3bcd7600f49470536a263792",
+      "bytes": 18739
+    },
+    {
+      "path": "js/audio.js",
+      "source": "https://nailong-dance.pages.dev/js/audio.js",
+      "sha256": "8a823c299770d95901bb7da7d740bc81b29421666a55baa3ba85b5bd5bc7cbed",
+      "bytes": 20510
+    },
+    {
+      "path": "js/chartgen.js",
+      "source": "https://nailong-dance.pages.dev/js/chartgen.js",
+      "sha256": "b878d83d99777ceb752b60fc7b059e17f92dcbf5205410fc5e72576694ca47e1",
+      "bytes": 8861
+    },
+    {
+      "path": "js/customstore.js",
+      "source": "https://nailong-dance.pages.dev/js/customstore.js",
+      "sha256": "31ab0b7aa1b193f7587c9216a2e29af28593073838a325536d9ef340a92daca5",
+      "bytes": 3128
+    },
+    {
+      "path": "js/dancer.js",
+      "source": "https://nailong-dance.pages.dev/js/dancer.js",
+      "sha256": "5afe0fcbb6447f3ed42175cc4aeea58a88006704affbcaeb0ff7e7caea1eff5e",
+      "bytes": 54541
+    },
+    {
+      "path": "js/fx.js",
+      "source": "https://nailong-dance.pages.dev/js/fx.js",
+      "sha256": "b869f1c4f369ede1d5feae8a20a1b837bc1d18445128eea82c03ff7b72b61798",
+      "bytes": 7867
+    },
+    {
+      "path": "js/game.js",
+      "source": "https://nailong-dance.pages.dev/js/game.js",
+      "sha256": "e61d51907fa438aeac69cc7f5290e50263108ff565302d9916ee1f9bb1b43b12",
+      "bytes": 23318
+    },
+    {
+      "path": "js/main.js",
+      "source": "https://nailong-dance.pages.dev/js/main.js",
+      "sha256": "1c9a2744438fd60137238e5e9056102a061474cb31e17951e733bcfaf3cc10c8",
+      "bytes": 26990
+    },
+    {
+      "path": "js/opening.js",
+      "source": "https://nailong-dance.pages.dev/js/opening.js",
+      "sha256": "cf1d55bca1ad59082f6d80e38f533dba8f2cf33ae8896373b9de25be7d594f73",
+      "bytes": 8502
+    },
+    {
+      "path": "js/ui.js",
+      "source": "https://nailong-dance.pages.dev/js/ui.js",
+      "sha256": "309b85b864f032314e939f4345d7d6a7dcaf63ad765a78cdc9ecda04482a5741",
+      "bytes": 79213
+    },
+    {
+      "path": "music.mp3",
+      "source": "https://nailong-dance.pages.dev/music.mp3",
+      "sha256": "d176317b1839dacecfed235a2769c352f5655b0e1e90727c8ddb351658f4814c",
+      "bytes": 2149146
+    },
+    {
+      "path": "package.json",
+      "source": null,
+      "sha256": "6a8dca6f7b16470cdcf68dd710540beb5be3c1d03290e6ba6616ed00b34ca2de",
+      "bytes": 228
+    },
+    {
+      "path": "README.md",
+      "source": null,
+      "sha256": "8900c597a75a190f48f74bdd76c82448bc61663931cd498db6a6fe56ca392d0b",
+      "bytes": 3355
+    },
+    {
+      "path": "rigged.glb",
+      "source": "https://nailong-dance.pages.dev/rigged.glb",
+      "sha256": "57ff723104e0fbe21cd641651fb94de52c8c8aefdc7547866cafc0e2f37c2d89",
+      "bytes": 719360
+    },
+    {
+      "path": "server.mjs",
+      "source": null,
+      "sha256": "27c1bf4a566dad33b3780b2738534ad36a30f5cffc3b36ecab2e78b32a947429",
+      "bytes": 2188
+    },
+    {
+      "path": "sounds/voice-1.mp3",
+      "source": "https://nailong-dance.pages.dev/sounds/voice-1.mp3",
+      "sha256": "ba102d545c971697d0a0ce79bbae83ee177bb13dc0a5288392228038428f391c",
+      "bytes": 75282
+    },
+    {
+      "path": "sounds/voice-2.mp3",
+      "source": "https://nailong-dance.pages.dev/sounds/voice-2.mp3",
+      "sha256": "c8928fdaf4875ecd95fdce747378bfcb38aca10f5ea044cbc71a0beebbbbf357",
+      "bytes": 87821
+    },
+    {
+      "path": "sounds/voice-3.mp3",
+      "source": "https://nailong-dance.pages.dev/sounds/voice-3.mp3",
+      "sha256": "8dd66ed2de0f164bb72b66fc483a8f3e1c519c8ac8ebf076eb6c7524397c484c",
+      "bytes": 43935
+    },
+    {
+      "path": "sounds/voice-end.mp3",
+      "source": "https://nailong-dance.pages.dev/sounds/voice-end.mp3",
+      "sha256": "0e5f9d1da08228e161a5384019467ec663fd23fdbea605aaaf89557236359d02",
+      "bytes": 145499
+    },
+    {
+      "path": "start.cmd",
+      "source": null,
+      "sha256": "bc7757b91072cfa081365c055d75f583303b3ba184cc7ede639d10c6db8947a8",
+      "bytes": 47
+    },
+    {
+      "path": "style.css",
+      "source": "https://nailong-dance.pages.dev/style.css",
+      "sha256": "bf8861483cb7738f9019fb65ca5c1036a2b1ca6b21e34dbf8f5151519d398cbc",
+      "bytes": 51631
+    },
+    {
+      "path": "vendor/three/addons/loaders/GLTFLoader.js",
+      "source": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js",
+      "sha256": "d073b438e6a07e1359741dd5d6c76c953420cc0d4fd84eb1bdde94315540e6a3",
+      "bytes": 108522
+    },
+    {
+      "path": "vendor/three/addons/utils/BufferGeometryUtils.js",
+      "source": "https://unpkg.com/three@0.160.0/examples/jsm/utils/BufferGeometryUtils.js",
+      "sha256": "9be041e96308775d00e2695cc607645b9a9b64fd7c0e759dd8f7c00a8d92becb",
+      "bytes": 31906
+    },
+    {
+      "path": "vendor/three/LICENSE",
+      "source": "https://unpkg.com/three@0.160.0/LICENSE",
+      "sha256": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
+      "bytes": 1081
+    },
+    {
+      "path": "vendor/three/three.module.js",
+      "source": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "sha256": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
+      "bytes": 1272972
+    }
+  ]
+}

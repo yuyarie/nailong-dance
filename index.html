@@ -1,0 +1,420 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>奶娃街舞 · Dance Baby</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 3D 画布容器（开场 + 主舞台共用一个渲染器） -->
+<div id="app"></div>
+
+<!-- 载入遮罩：糖果亮色渐变，全程不黑屏。
+     注意：「开跳」按钮必须在这一层内（本层 z-index 最高），
+     否则会被自己盖住造成「按钮点不到→开场不播→遮罩永不消失」的死锁 -->
+<div id="loadOverlay">
+  <img class="load-baby" src="baby.png" alt="奶娃">
+  <div class="load-txt" id="loadTxt">奶娃街舞 · 装扮舞台中…</div>
+  <div class="load-bar"><i id="loadBar"></i></div>
+  <!-- 初始化就绪前隐藏；就绪后由 main.js 点亮，点击解锁音频并开始开场 -->
+  <button class="gate-btn hidden" id="loadStart" disabled="">🎵 开 跳 🎵</button>
+  <div class="load-sub" id="loadSub">首次加载需下载 3D 模型，请稍候…</div>
+</div>
+
+<!-- ===================== 开场动画层 ===================== -->
+<div id="openingUI">
+  <!-- 交叉闪光 -->
+  <div id="crossFlash"></div>
+  <!-- 「奶娃街舞」Q弹大标题 -->
+  <div id="openTitle">
+    <span class="c1">奶</span><span class="c2">娃</span><span class="c3">街</span><span class="c4">舞</span>
+  </div>
+  <!-- 跳过提示 -->
+  <div id="openSkip">点击跳过 »</div>
+</div>
+
+<!-- ===================== 主界面 UI ===================== -->
+<div id="uiRoot">
+  <!-- 顶栏 -->
+  <header id="topbar">
+    <div class="logo">奶娃街舞</div>
+    <nav id="mainNav">
+      <button data-scr="scr-home" class="cur">🏠 主界面</button>
+      <button data-scr="scr-play">🎵 开跳</button>
+      
+      <button data-scr="scr-shop">👕 涂装工坊</button>
+      
+      <button data-scr="scr-ach">🎯 挑战之路</button>
+      <button data-scr="scr-rank">🏆 我的纪录</button>
+      <button data-scr="scr-set">⚙️ 设置</button>
+    </nav>
+    <div class="coin-chip">🪙 <span id="coinNum">0</span></div>
+  </header>
+
+  <!-- 主界面 -->
+  <section class="screen cur" id="scr-home">
+    <div class="home-hero">
+      <h1>奶娃街舞</h1>
+      <div class="slogan">N A I · W A · D A N C E —— 跟上节拍，扭起来！</div>
+      
+      <div class="home-btns">
+        <button class="btn-main" id="btnGoPlay">▶ 立即开跳</button>
+      </div>
+      
+      
+      
+    </div>
+    <div class="home-grid">
+      <button class="home-card" data-scr="scr-play"><span class="ic">🎵</span>选曲开跳</button>
+      
+      <button class="home-card" data-scr="scr-shop"><span class="ic">👕</span>涂装工坊</button>
+      
+      <button class="home-card" data-scr="scr-rank"><span class="ic">🏆</span>我的纪录</button>
+      <button class="home-card" data-scr="scr-ach"><span class="ic">🎯</span>挑战之路</button>
+      <button class="home-card" data-scr="scr-set"><span class="ic">⚙️</span>游戏设置</button>
+    </div>
+    <div class="home-stats">
+      <div class="st">累计开跳<b id="stPlays">0</b>次</div>
+      <div class="st">最高分<b id="stBest">0</b></div>
+      <div class="st">最大连击<b id="stCombo">0</b></div>
+      <div class="st">累计 Perfect<b id="stPerf">0</b></div>
+    </div>
+  </section>
+
+  <!-- 开跳：选歌曲 + 难度 -->
+  <section class="screen" id="scr-play">
+    <div class="play-head">
+      <button class="btn-back" id="btnPlayBack">← 返回</button>
+      <div class="sec-title" style="margin:0">🎵 开跳 <small>PLAY</small></div>
+      <button class="btn-custom-song" id="btnUploadSong">🎤 自定义歌曲<span>上传本地音乐 · 自动生成乐谱</span></button>
+    </div>
+    <div class="sec-title">🎵 选择歌曲 <small>SELECT SONG</small></div>
+    
+    <input type="text" id="songSearch" class="set-input" maxlength="20" placeholder="🔍 搜歌名 / 歌手，快速定位（如：奶油）" style="width:100%;margin:2px 0 4px">
+    <div class="lvz-row" id="lvZoneRow"></div>
+    <div class="theme-grid" id="songGrid"></div>
+    <!-- 自定义歌曲列表（用户上传的，存 localStorage） -->
+    <div id="customSongs" style="display:none">
+      <div class="sec-sub">🎤 我的上传 <small>本地保存，不上服务器</small></div>
+      <div class="theme-grid" id="customSongGrid"></div>
+    </div>
+    <div class="sec-title">🔥 选择难度 <small>DIFFICULTY</small></div>
+    <div class="diff-row" id="diffRow"></div>
+    <div class="mode-row"><button class="mode-chip" id="holdChip"></button></div>
+    <div class="play-foot">
+      <button class="btn-main" id="btnStart">🚀 开始表演</button>
+      <div class="tip">← ↓ ↑ → 方向键 hit 箭头 · 节拍不准？去设置里校准 BPM 和延迟</div>
+    </div>
+  </section>
+
+  <!-- 联机大厅 -->
+  
+
+  <!-- 联机房间 -->
+  
+
+  <!-- 涂装工坊 -->
+  <section class="screen" id="scr-shop">
+    <div class="page-head">
+      <button class="btn-back" data-back="">← 返回</button>
+      <div class="sec-title" style="margin:0">👕 涂装工坊 <small>PAINT SHOP</small></div>
+    </div>
+    <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="装扮类别"></div>
+    <div class="shop-category-head">
+      <div><div class="sec-title" id="shopCategoryName"></div><div class="shop-category-tip" id="shopCategoryTip"></div></div>
+      <button class="btn-ghost shop-clear" data-act="clear-look">🚫 清空装扮</button>
+    </div>
+    <div class="grid-cards" id="shopGrid" role="tabpanel" tabindex="0"></div>
+  </section>
+
+  
+  
+
+  <!-- 挑战之路 -->
+  <section class="screen" id="scr-ach">
+    <div class="page-head">
+      <button class="btn-back" data-back="">← 返回</button>
+      <div class="sec-title" style="margin:0">🎯 挑战之路 <small>CHALLENGE ROAD</small></div>
+    </div>
+    <div id="achList"></div>
+  </section>
+
+  <!-- 本机纪录 -->
+  <section class="screen" id="scr-rank">
+    <div class="page-head">
+      <button class="btn-back" data-back="">← 返回</button>
+      <div class="sec-title" style="margin:0">🏆 本机纪录 <small>RANK</small></div>
+    </div>
+    
+    <div class="rank-tabs" id="rankTabs">
+      <button data-d="easy" class="cur">😌 热身</button>
+      <button data-d="normal">🔥 狂热</button>
+      <button data-d="hard">💀 地狱</button>
+      <button data-d="endless">♾️ 无尽</button>
+      
+    </div>
+    <div id="rankList"></div>
+  </section>
+
+  <!-- 设置 -->
+  <section class="screen" id="scr-set">
+    <div class="page-head">
+      <button class="btn-back" data-back="">← 返回</button>
+      <div class="sec-title" style="margin:0">⚙️ 设置 <small>SETTINGS</small></div>
+    </div>
+
+    <div class="set-item">
+      <span class="sl">🎵 音乐音量</span>
+      <input type="range" id="setVol" min="0" max="100" value="80">
+      <span class="sv" id="setVolV">80%</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">🔊 音效</span>
+      <select id="setSfx"><option value="1">开启</option><option value="0">关闭</option></select>
+      <span class="mini-tip">判定 / 开场 / 按钮音效开关</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">⏱️ 判定偏移</span>
+      <input type="range" id="setOffset" min="-200" max="200" step="10" value="0">
+      <span class="sv" id="setOffsetV">0ms</span>
+      <span class="mini-tip">箭头总是早到就调正数，总是晚到就调负数</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">🥁 音乐 BPM</span>
+      <input type="range" id="setBpm" min="60" max="180" step="1" value="104">
+      <span class="sv" id="setBpmV">104</span>
+      <button class="btn-ghost" id="btnTap">👆 跟着节奏点我</button>
+      <span class="mini-tip">跟着音乐鼓点连点这个按钮，自动测出 BPM（点 4 下以上生效）</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">🚀 箭头流速（Hi-Speed）</span>
+      <input type="range" id="setSpeed" min="0.5" max="2.0" step="0.1" value="1">
+      <span class="sv" id="setSpeedV">1.0×</span>
+      <span class="mini-tip">只改变箭头下落快慢，不影响音乐速度。职业选手一般调到 1.2~1.5 手感最顺。</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">🖥️ 画面质量</span>
+      <select id="setQuality">
+        <option value="0.75">流畅</option>
+        <option value="1" selected="">标准</option>
+        <option value="2">高清</option>
+        <option value="3">极致（高耗电）</option>
+      </select>
+    </div>
+    
+    <div class="set-item">
+      <span class="sl">👆 按键大小</span>
+      <select id="setPad">
+        <option value="0.8">小巧 0.8×</option>
+        <option value="1" selected="">标准 1.0×</option>
+        <option value="1.25">加大 1.25×</option>
+        <option value="1.5">特大 1.5×</option>
+      </select>
+      <span class="mini-tip">触屏箭头按钮的大小，点不到、老断触就调大一档</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">↔️ 按键间距</span>
+      <select id="setGap">
+        <option value="0.85">紧凑 0.85×</option>
+        <option value="1" selected="">标准 1.0×</option>
+        <option value="1.15">加宽 1.15×</option>
+        <option value="1.3">超宽 1.3×</option>
+      </select>
+      <span class="mini-tip">四个轨道按键之间的水平距离，觉得挤/手指打架就加宽（音符轨道同步跟着散开）</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">🫳 触屏滑动</span>
+      <select id="setSwipe">
+        <option value="1" selected="">开启（滑屏判定）</option>
+        <option value="0">关闭（用箭头按钮）</option>
+      </select>
+      <span class="mini-tip">手机上滑屏 = 方向输入，点屏幕对应位置 = 直接按轨道，长按 = 按住长条；开启后隐藏箭头按钮；电脑端始终可用方向键</span>
+    </div>
+    <div class="set-item">
+      <span class="sl">🧗 抓奶娃惩罚</span>
+      <select id="setClimb">
+        <option value="1" selected="">开启（Miss 太多会爬墙）</option>
+        <option value="0">关闭（只扣分不惩罚）</option>
+      </select>
+      <span class="mini-tip">连续 Miss 5 次奶娃会往上爬：先点手腕黄圈、再点头部红圈就能安抚；期间音乐照放、音符照常判定，不影响得分节奏</span>
+    </div>
+    <div class="set-item" style="display:block">
+      <div class="sl" style="margin-bottom:10px">📖 判定与得分规则</div>
+      <div class="rule-card">
+        <p>🎯 <b class="rc-p">PERFECT</b>：按压时机与节拍误差 ≤ 70ms，得 <b>1000 分</b></p>
+        <p>👍 <b class="rc-g">GOOD</b>：误差 ≤ 150ms，得 <b>500 分</b></p>
+        <p>❌ <b class="rc-m">MISS</b>：超过 190ms 没按到，0 分并断连击（空按不惩罚）</p>
+        <p>🔥 <b>连击加成</b>：每次命中额外 +10 × 当前连击数（封顶 +600）</p>
+        <p>🎹 <b>长条（钢琴块式）</b>：头部点中立刻得分并计连击 → 按住到尾自动再收一份满额尾分；提前松手按剩余比例给尾分，松得太快（不足 15%）尾分归零但不断连击</p>
+        <p>🏅 <b>评级</b>（准确率 = Perfect + Good×50%）：SS ≥98% 且 0 Miss ｜ S ≥92% ｜ A ≥80% ｜ B ≥65% ｜ 其余 C</p>
+        <p>🪙 <b>奶币</b> = 结算分数 ÷ 400（向下取整）</p>
+        <p>♾️ <b>无尽模式</b>：每 30 秒加速 0.1×，封顶 2×；随时退出即结算，记录保存在本机</p>
+      </div>
+    </div>
+    
+    
+    
+    
+    <div class="set-item">
+      <span class="sl">🧹 重置存档</span>
+      <button class="btn-ghost" id="btnReset">清空全部进度</button>
+      <span class="mini-tip">金币 / 涂装 / 纪录 / 成就 全部清空，慎点！</span>
+    </div>
+    <div style="text-align:center;margin-top:18px;line-height:1.9">
+      <div style="font-size:12px;color:var(--sub)">📬 联系方式</div>
+      <div style="font-size:15px;color:#fff;font-weight:bold">念因</div>
+      <a href="mailto:1139568835@qq.com" style="font-size:13px;color:var(--cyan);text-decoration:none">1139568835@qq.com</a>
+    </div>
+    <div style="text-align:center;margin-top:18px">
+      <span id="verEgg" style="font-size:11px;color:var(--sub);opacity:.5;cursor:default;user-select:none">奶娃街舞 V3.9</span>
+      
+    </div>
+  </section>
+
+  <!-- 结算 -->
+  <section class="screen" id="scr-result">
+    <div class="result-box card">
+      <div class="result-rank" id="resRank">S</div>
+      <div class="result-score" id="resScore">0</div>
+      <div class="result-new" id="resNew" style="display:none">🎉 新纪录！</div>
+      <div id="resQuote" style="font-size:20px;font-weight:900;color:var(--yellow);margin:8px 0;text-shadow:0 2px 8px #000"></div>
+      <div class="result-grid">
+        <div class="rg"><b id="resPerfect" style="color:var(--cyan)">0</b><span>PERFECT</span></div>
+        <div class="rg"><b id="resGood" style="color:var(--yellow)">0</b><span>GOOD</span></div>
+        <div class="rg"><b id="resMiss" style="color:var(--pink)">0</b><span>MISS</span></div>
+        <div class="rg"><b id="resCombo" style="color:var(--purple)">0</b><span>最大连击</span></div>
+      </div>
+      <div class="result-coin">🪙 本场演出费 +<span id="resCoin">0</span> 奶币</div>
+      <div class="season-badge" id="seasonBadge"></div>
+      <div id="seasonInfo" style="font-size:11px;color:var(--sub);margin:-2px 0 4px"></div>
+      <div class="replay-strip" id="replayStrip"></div>
+      <div class="result-btns">
+        <button class="btn-main" id="btnRetry">🔁 再来一次</button>
+        <button class="btn-ghost" id="btnBackHome">回主界面</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 联机结算 -->
+  
+</div>
+
+<!-- ===================== 游戏进行中 ===================== -->
+<div id="stageUI">
+  <!-- 触屏滑动输入层（层级最低，不挡暂停/退出/触控按钮） -->
+  <div id="swipeLayer"></div>
+  <!-- ★ 暂停/退出按钮（触屏用户也能点到，不依赖键盘 ESC）-->
+  <div class="stage-top-btns">
+    <button id="btnPause" class="pause-btn" title="暂停">⏸</button>
+    <button id="btnQuitDirect" class="quit-btn" title="退出演出">✕</button>
+  </div>
+  <div id="hud">
+    <div class="hs" id="hudScore">0</div>
+    <div class="hmeta" id="hudMeta">P 0 · G 0 · M 0 · 100%</div>
+    <div class="hmeta" id="hudRate" style="color:#ffe17a"></div>
+  </div>
+  <div id="comboBox"><div class="cnum" id="comboNum">0</div><div class="clab">COMBO</div></div>
+  <!-- 联机：其他玩家实时分数条 -->
+  
+  <!-- 联机分屏同框：2×2 格子（DOM 在 noteWrap 之前 → 层级低于音符） -->
+  
+  <!-- 联机：开局倒数 / 等待提示 -->
+  
+  <!-- 换人接音符横幅 -->
+  
+  <div id="noteWrap">
+    <div id="noteTilt">
+      <div class="lane" data-l="0"></div>
+      <div class="lane" data-l="1"></div>
+      <div class="lane" data-l="2"></div>
+      <div class="lane" data-l="3"></div>
+      <div id="hitLine"></div>
+      <div class="receptor" data-l="0"><span class="na" style="display:inline-block;transform:rotate(180deg)">➤</span></div>
+      <div class="receptor" data-l="1"><span class="na" style="display:inline-block;transform:rotate(90deg)">➤</span></div>
+      <div class="receptor" data-l="2"><span class="na" style="display:inline-block;transform:rotate(-90deg)">➤</span></div>
+      <div class="receptor" data-l="3"><span class="na">➤</span></div>
+      <div id="floatLayer"></div>
+      <!-- ★ 触控按钮放进 noteTilt，和接收器共享透视，完全重合 -->
+      <div id="touchPads">
+        <button data-l="0"><span style="display:inline-block;transform:rotate(180deg)">➤</span></button>
+        <button data-l="1">⬇</button>
+        <button data-l="2">⬆</button>
+        <button data-l="3">➤</button>
+      </div>
+    </div>
+  </div>
+  <div id="missVig"></div>
+</div>
+
+<!-- 暂停 -->
+<div id="pauseOv">
+  <div class="pbox">
+    <div class="pt">⏸ 暂 中</div>
+    <button class="btn-main" id="btnResume">▶ 继续</button>
+    <button class="btn-ghost" id="btnRestart">🔁 重开</button>
+    <button class="btn-ghost" id="btnQuit">退出演出</button>
+  </div>
+</div>
+
+<!-- 账号弹窗 -->
+
+
+<!-- 二创引导弹窗（每天首次进主界面弹一次） -->
+<div id="fanModal">
+  <div class="fanbox">
+    <button id="fanClose" title="关闭">✕</button>
+    <div class="fan-hearts">💗🎶💗</div>
+    <div class="fan-title">谢谢你来玩奶娃街舞！</div>
+    <div class="fan-txt">每一支舞、每一次开跳，都是奶娃最大的快乐✨</div>
+    <div class="fan-card">
+      <div class="fan-sub">做二创视频非常欢迎！</div>
+      <div class="fan-txt2">发视频的时候记得 <b>@念因</b>，让我也能看到你的作品，我去点赞支持！</div>
+      <div class="fan-acc">
+        <span>🎵 抖音 <b>@念因</b></span>
+        <span>📕 小红书 <b>@念因</b></span>
+      </div>
+    </div>
+    <label class="fan-tip"><input type="checkbox" id="fanTipChk"> 今日不再提醒</label>
+    <button class="btn-main" id="fanOk" style="width:100%;padding:13px;font-size:16px">💗 好嘞，舞池见！</button>
+  </div>
+</div>
+
+<!-- 自定义歌曲上传面板 -->
+<div id="customModal">
+  <div class="cm-box card">
+    <button class="cm-x" id="cmClose">✕</button>
+    <div class="cm-title">🎤 自定义歌曲</div>
+    <div class="cm-tip">上传一首本地音乐，自动分析鼓点节拍生成专属乐谱，随时单人开跳。</div>
+    <div class="cm-pick-wrap">
+      <div class="cm-pick" id="cmPick">📁 选择本地音乐文件<small>支持 mp3 / wav / ogg / m4a，≤9MB，8秒~10分钟</small></div>
+      <input class="cm-file" type="file" id="fileSong" accept="audio/*">
+    </div>
+    <div id="cmProgress"><div class="cm-prog-bar"><div class="cm-bar"></div></div><div class="cm-label">解析中…</div></div>
+    <div class="cm-list" id="cmList"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- 长页面快速回顶/到底 -->
+<div id="quickScroll">
+  <button id="qsTop" aria-label="回到顶部">↑</button>
+  <button id="qsBot" aria-label="跳到底部">↓</button>
+</div>
+<div id="modelTip"></div>
+
+<!-- importmap 引本地 Three.js -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+
+
+<script type="module" src="js/main.js"></script>
+
+
+</body></html>
