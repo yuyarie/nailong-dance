@@ -242,6 +242,23 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .btn-back:hover{color:#fff;background:#ffffff1c}
 .btn-back:active{transform:scale(.95)}
 .theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:12px 0 20px}
+.library-summary{font-size:12px;color:var(--sub);margin:10px 0}
+.song-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin:12px 0 20px}
+.library-song{background:linear-gradient(135deg,#7a4dff26,#36d1ff12);border:1px solid #ffffff24;border-radius:18px;padding:16px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.library-song.sel{border-color:var(--pink);box-shadow:0 0 20px #ff6bb526}
+.library-song-head{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.library-cover{width:100px;height:100px;flex-shrink:0;object-fit:cover;border-radius:12px;background:#392255;box-shadow:0 4px 12px #0004}
+.library-info{min-width:0;flex:1}.library-info .tname{font-size:17px;font-weight:900;overflow-wrap:anywhere;line-height:1.4}
+.library-artist{font-size:12px;color:var(--sub);margin:4px 0;overflow-wrap:anywhere}
+.library-count{font-size:10px;letter-spacing:1px;color:#bcacf0;margin:6px 0 8px}
+.library-charts{display:flex;flex-direction:column;gap:8px}.library-chart-row{display:flex;gap:6px;align-items:center}
+.library-chart{position:relative;width:100%;min-width:0;border:1px solid #ffffff1f;border-radius:10px;padding:10px 12px;background:#160f2b66;color:#fff;text-align:left;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+.library-chart:hover{background:#7a4dff40;border-color:#b39bff99}.library-chart.sel{background:#ff6bb51c;border-color:var(--pink)}
+.library-difficulty{display:block;font-size:13px;font-weight:800;overflow-wrap:anywhere;padding-right:48px}
+.library-chart-meta{display:block;font-size:11px;color:var(--sub);line-height:1.6;margin-top:4px;overflow-wrap:anywhere}
+.library-selected{position:absolute;right:10px;top:10px;color:var(--pink);font-size:11px;font-weight:800}
+.selected-chart-info{font-size:13px;color:#e4caff;margin:8px 0 14px;overflow-wrap:anywhere}
+@media(max-width:420px){.song-library-grid{grid-template-columns:minmax(0,1fr)}.library-cover{width:82px;height:82px}.library-song{padding:12px}}
 /* 歌曲分类小标题（跨整行，玻璃拟态分隔条；滚动时吸顶方便定位） */
 .song-cat-head{
   grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;
@@ -548,6 +565,24 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 }
 .pv-btn:hover{background:#000000cc;border-color:#fff}
 .pv-btn.on{background:var(--pink);border-color:#fff;box-shadow:0 0 12px #ff3b6b88}
+.library-info .pv-btn{position:static;display:inline-block}
+.library-song-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;color:#fff;font-family:inherit;cursor:pointer}
+.library-song-card:hover{border-color:#b39bff99;background-color:#7a4dff26}
+.library-song-card:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.library-song-card .library-cover{width:82px;height:82px}
+.library-levels{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.library-level{border-radius:6px;padding:3px 7px;background:#ffffff14;font-size:12px;color:#d4c7f3}
+.library-level.sel{color:#fff;background:#ff6bb53d}
+.song-detail-head{display:flex;align-items:center;gap:20px;margin:22px 0}
+.song-detail-head h2{margin:0;font-size:24px;overflow-wrap:anywhere}
+.song-detail-head .library-cover{width:120px;height:120px}
+.song-detail-head .pv-btn{position:static}
+#songDetails{max-width:760px;margin:0 auto}
+#songDetails .library-chart{padding:16px}
+#libraryHeader[hidden],#libraryBrowse[hidden],#songDetails[hidden]{display:none}
+#songProgress{position:absolute;inset:0 0 auto;height:3px;background:#ffffff20;pointer-events:none;z-index:10}
+#songProgressFill{height:100%;width:100%;transform:scaleX(0);transform-origin:left;background:var(--cyan)}
+@media(max-width:480px){.song-detail-head{gap:14px}.song-detail-head .library-cover{width:88px;height:88px}.song-detail-head h2{font-size:20px}}
 
 /* 长条模式开关（选歌页难度下方） */
 .mode-row{display:flex;gap:10px;margin:-4px 0 16px}
@@ -1038,6 +1073,9 @@ body.swipeOn #stageUI.on #swipeLayer{display:block}
 
 /* 涂装工坊分类标签 */
 .key-bindings{display:flex;flex-wrap:wrap;gap:10px;flex:1}
+.offset-calibration{display:flex;flex-wrap:wrap;gap:10px;width:100%}
+#calTap.beat{border-color:var(--cyan);box-shadow:0 0 18px #36d1ff88}
+.offset-calibration button:disabled{opacity:.45;cursor:default}
 .key-binding{display:flex;flex-direction:column;gap:6px;min-width:76px;padding:10px 14px}
 .key-binding span{font-size:12px;color:var(--sub)}
 .key-binding b{font-size:18px;color:var(--yellow)}
@@ -1056,3 +1094,10 @@ body.swipeOn #stageUI.on #swipeLayer{display:block}
 .shop-clear{white-space:nowrap;font-size:12px;padding:9px 13px}
 .shop-tab:focus-visible,#shopGrid:focus-visible{outline:2px solid var(--cyan);outline-offset:4px}
 @media(max-width:600px){.shop-tabs{gap:8px;margin:14px 0 18px}.shop-tab{padding:10px 12px;font-size:13px;gap:6px}.shop-category-head{align-items:flex-start}.shop-category-head .sec-title{font-size:19px}}
+
+#songDetails .library-chart-row{border:1px solid #ffffff1f;border-radius:10px;background:#160f2b66;padding-right:12px;gap:12px}
+#songDetails .library-chart-row.sel{border-color:var(--pink);background:#ff6bb51c}
+#songDetails .library-chart{flex:1;border:0;background:transparent;width:auto}
+#songDetails .chart-start{flex-shrink:0;font-size:15px;padding:12px 18px;white-space:nowrap}
+#songDetails .chart-start:disabled{opacity:.55;cursor:wait}
+@media(max-width:480px){#songDetails .library-chart-row{gap:6px;padding-right:8px}#songDetails .chart-start{font-size:12px;padding:10px 12px}#songDetails .library-chart{padding:12px 10px}#songDetails .library-difficulty{padding-right:0}#songDetails .library-selected{position:static;display:block;margin-top:3px}}

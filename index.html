@@ -83,19 +83,19 @@
 
   <!-- 开跳：选择本地谱面 -->
   <section class="screen" id="scr-play">
-    <div class="play-head">
+    <div class="play-head" id="libraryHeader">
       <button class="btn-back" id="btnPlayBack">← 返回</button>
       <div class="sec-title" style="margin:0">🎵 开跳 <small>PLAY</small></div>
       <button class="btn-custom-song" id="btnUploadSong">🎤 导入谱面<span>Malody 4Key · 本地谱面与音乐</span></button>
     </div>
-    <div class="sec-title">🎵 选择歌曲 <small>SELECT SONG</small></div>
+    <div id="libraryBrowse">
+    <div class="sec-title">🎵 本地曲库 <small>SONG LIBRARY</small></div>
     
-    <input type="text" id="songSearch" class="set-input" maxlength="20" placeholder="🔍 搜歌名 / 歌手，快速定位" style="width:100%;margin:2px 0 4px">
-    <div class="theme-grid" id="songGrid"></div>
-    <div class="play-foot">
-      <button class="btn-main" id="btnStart">🚀 开始表演</button>
-      <div class="tip" id="playKeyTip">key1: D · key2: F · key3: J · key4: K · 长条按住至结束</div>
+    <input type="text" id="songSearch" class="set-input" maxlength="100" placeholder="🔍 搜歌名 / 歌手 / 难度 / 谱师" style="width:100%;margin:2px 0 4px">
+    <div class="library-summary" id="librarySummary"></div>
+    <div class="song-library-grid" id="songGrid"></div>
     </div>
+    <div id="songDetails" hidden></div>
   </section>
 
   <!-- 联机大厅 -->
@@ -173,6 +173,12 @@
       <input type="range" id="setOffset" min="-1000" max="1000" step="10" value="0">
       <span class="sv" id="setOffsetV">0ms</span>
       <span class="mini-tip">箭头总是早到就调正数，总是晚到就调负数</span>
+      <div class="offset-calibration">
+        <button type="button" class="btn-ghost" id="calStart">🥁 测量判定偏移</button>
+        <button type="button" class="btn-ghost" id="calTap" disabled>👆 跟拍击打</button>
+        <button type="button" class="btn-ghost" id="calApply" disabled>应用测量结果</button>
+      </div>
+      <span class="mini-tip" id="calStatus" role="status">先听 4 拍，再跟随 120 BPM 节拍按任一绑定键、空格或点击“跟拍击打”，测量 20 拍。请使用实际游玩的耳机和设备。</span>
     </div>
     <div class="set-item">
       <span class="sl">🚀 箭头流速（Hi-Speed）</span>
@@ -288,6 +294,7 @@
 
 <!-- ===================== 游戏进行中 ===================== -->
 <div id="stageUI">
+  <div id="songProgress" aria-hidden="true"><div id="songProgressFill"></div></div>
   <!-- 触屏滑动输入层（层级最低，不挡暂停/退出/触控按钮） -->
   <div id="swipeLayer"></div>
   <!-- ★ 暂停/退出按钮（触屏用户也能点到，不依赖键盘 ESC）-->

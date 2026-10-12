@@ -9,7 +9,7 @@ const chart = (notes, timing = [{beat:[0,0,1],bpm:120}], offset = 0) => ({
 });
 const close = (a,b) => assert.ok(Math.abs(a-b)<1e-8, `${a} != ${b}`);
 test('provided chart preserves all columns, beat fractions, holds and 344ms audio offset', () => {
-  const raw = JSON.parse(fs.readFileSync(new URL('../charts/default/1565787429.mc',import.meta.url),'utf8'));
+  const raw = JSON.parse(fs.readFileSync(new URL('../charts/library/_song_9160/1565787429.mc',import.meta.url),'utf8'));
   const parsed = parseMalody(raw);
   assert.equal(parsed.notes.length,773); assert.equal(parsed.notes.filter(n=>n.len).length,64);
   close(parsed.notes[0].t,3*60/174-.344); assert.equal(parsed.notes[0].lane,3);
@@ -21,6 +21,16 @@ test('BPM changes are integrated for both hold endpoints; sound beat and signed 
   raw.note.at(-1).beat=[1,0,1];
   let parsed=parseMalody(raw); close(parsed.notes[0].t,-.25);close(parsed.notes[0].len,.75);close(parsed.notes[1].t,.75);
   raw.note.at(-1).offset=-250; parsed=parseMalody(raw);close(parsed.notes[0].t,.25);
+});
+test('legacy BGM column and unnormalized fractions retain timing; preview is in milliseconds', () => {
+  const raw = chart([{beat:[5,1,1],column:0},{beat:[7,3,4],endbeat:[7,4,4],column:3}], undefined, 429);
+  raw.note.at(-1).column = 4;
+  raw.meta.preview = 25000;
+  const parsed = parseMalody(raw);
+  assert.equal(parsed.notes.length, 2);
+  close(parsed.notes[0].t, 3 - .429);
+  close(parsed.notes[1].len, .125);
+  assert.equal(parsed.previewStart, 25);
 });
 test('reject invalid modes, columns, BPM, malformed fractions, missing audio, backwards and overlapping holds', () => {
   const basic=()=>chart([{beat:[1,0,1],column:0}]);

@@ -1,7 +1,7 @@
 {
   "savedOn": "2026-10-12",
   "sourceSite": "https://nailong-dance.pages.dev/",
-  "note": "Local pure frontend version with imported Malody 4Key charts; hashes describe the local version. Default chart/audio were supplied by the user.",
+  "note": "Local pure frontend version. User-supplied beatmap library retains 44 song groups and 68 Malody Key-mode 4Key charts, required audio, and one cover per song. Other modes, TJA charts, and obsolete default song resources are excluded. Hashes describe the local version.",
   "files": [
     {
       "path": ".gitignore",
@@ -28,16 +28,964 @@
       "bytes": 719580
     },
     {
-      "path": "charts/default/1565767011.ogg",
+      "path": "charts/library/_song_15988/1719720567.mc",
+      "source": null,
+      "sha256": "14c9ce9ba4160579eb569a802f527d01d531c0e43515c59c8743d995ef1cd8cf",
+      "bytes": 20293
+    },
+    {
+      "path": "charts/library/_song_15988/audio.ogg",
+      "source": null,
+      "sha256": "4088a921ccd5575001a555c04b8d55e5f074dcaba68d6e121dc802a185814b1c",
+      "bytes": 2342702
+    },
+    {
+      "path": "charts/library/_song_15988/cover.jpg",
+      "source": null,
+      "sha256": "55cf0cb14071dc1184c01224d90ac55ff6fb1d41b41aeda4a35992ff5946d62f",
+      "bytes": 771859
+    },
+    {
+      "path": "charts/library/_song_18021/1629988724.ogg",
+      "source": null,
+      "sha256": "2263e7f52aee9588c563beb4ed043bfce0ecccab4420a1d5d27c94b3eda0dbc8",
+      "bytes": 3104661
+    },
+    {
+      "path": "charts/library/_song_18021/1630048555.mc",
+      "source": null,
+      "sha256": "257f9480de4c26f06f3afc7b520af13015ab10e3b56ea977e742713a1944a159",
+      "bytes": 34287
+    },
+    {
+      "path": "charts/library/_song_18021/cover.jpg",
+      "source": null,
+      "sha256": "d398bb1f98e0ee4ea20989a599ccfb83593f4522ad39051e0219573d25b93c19",
+      "bytes": 1574910
+    },
+    {
+      "path": "charts/library/_song_19380/1604054738.mc",
+      "source": null,
+      "sha256": "f68c372978ef044cb1f16095ca14dd943642a38f937c34d2f5e9b88960c91ed9",
+      "bytes": 27650
+    },
+    {
+      "path": "charts/library/_song_19380/cover.png",
+      "source": null,
+      "sha256": "eb42e393711afdd409d31e71f1e5aed1e9252b1e10aa81c53e36233aefb73ba3",
+      "bytes": 883472
+    },
+    {
+      "path": "charts/library/_song_19380/Kyousui Ichika.ogg",
+      "source": null,
+      "sha256": "022942e22f884665ad19c004d61d0c8a476a87823f3c10517e7d450eb6e51246",
+      "bytes": 2889692
+    },
+    {
+      "path": "charts/library/_song_19908/1774116366.ogg",
+      "source": null,
+      "sha256": "ac6e416705571f71679ee5320458e6bd5e070572e3702e6d182548650f2b5a6c",
+      "bytes": 2620503
+    },
+    {
+      "path": "charts/library/_song_19908/1777364489.mc",
+      "source": null,
+      "sha256": "3372d0b30fc0fe57fda2b59bb9d6e118fe2e2ac1f6cdbad47b1daa362f4a6d08",
+      "bytes": 30802
+    },
+    {
+      "path": "charts/library/_song_19908/cover.png",
+      "source": null,
+      "sha256": "78703aa1474326f57743ba36737542952a9910693e2d0c488ed2e421fe125553",
+      "bytes": 859534
+    },
+    {
+      "path": "charts/library/_song_21118/1613219251.ogg",
+      "source": null,
+      "sha256": "f0f41bc139251a1b458a62913a2e264f2c8d0edad587431fc0898ae10bc4ac44",
+      "bytes": 3051634
+    },
+    {
+      "path": "charts/library/_song_21118/1622473392.mc",
+      "source": null,
+      "sha256": "60f70c54122231035ccece2a049eea799a77aeade39aba65f3d889facf12317d",
+      "bytes": 48138
+    },
+    {
+      "path": "charts/library/_song_21118/cover.jpg",
+      "source": null,
+      "sha256": "ecaabd4d2c5f574eeb264097bc0450d5d41ab4f15a42b8d4cc38187927286363",
+      "bytes": 274317
+    },
+    {
+      "path": "charts/library/_song_21296/1673523708.mc",
+      "source": null,
+      "sha256": "c03564bf084ccca6a096b52bbbf6944b2cc5306aed02efc5fc65132d4e24689a",
+      "bytes": 39678
+    },
+    {
+      "path": "charts/library/_song_21296/1673524330.mc",
+      "source": null,
+      "sha256": "80c54d9f72cbf6d8dcd74533845155c78ca159990616b95642d68f285facd48a",
+      "bytes": 31635
+    },
+    {
+      "path": "charts/library/_song_21296/cover.jpg",
+      "source": null,
+      "sha256": "ee4f13708df0e6f87949cd86d8fac35e3eaee1c61873a277c1621647b604e087",
+      "bytes": 651006
+    },
+    {
+      "path": "charts/library/_song_21296/Henv.ogg",
+      "source": null,
+      "sha256": "15be1f8635e14b3d152521623ad194de57d68458bb181466c29621aa6010bc20",
+      "bytes": 2631980
+    },
+    {
+      "path": "charts/library/_song_23666/1776435993.mc",
+      "source": null,
+      "sha256": "dc890a013393fefeb0234859c29c3f42085664bd6040b3191ac494adb690cb71",
+      "bytes": 25719
+    },
+    {
+      "path": "charts/library/_song_23666/cover.jpg",
+      "source": null,
+      "sha256": "c06d2cbf3154ac5c8e1bf4483c52a1e954c77b9dc5ffa5bfc6d4af735c147df9",
+      "bytes": 300185
+    },
+    {
+      "path": "charts/library/_song_23666/khkb.ogg",
+      "source": null,
+      "sha256": "9a4775f0c63491448832f4c568f35cd9eef529db4dc5e2af52bbfebc557baea9",
+      "bytes": 4036785
+    },
+    {
+      "path": "charts/library/_song_23965/1665171607.mc",
+      "source": null,
+      "sha256": "3ef9b0d415e4acbf9f4ff0dfbbcbc804cbfcf1ffb98550794a7ed50b6094b08a",
+      "bytes": 29536
+    },
+    {
+      "path": "charts/library/_song_23965/cover.jpg",
+      "source": null,
+      "sha256": "7224f5faa6cd876ec18084d149bfe8da9383592f89bd98777ea9c71920494987",
+      "bytes": 225790
+    },
+    {
+      "path": "charts/library/_song_23965/internet_overdose.ogg",
+      "source": null,
+      "sha256": "3eb1ae938881abd132c23f45c1f509aa8f584c5d08503ed8322a335e5bd36b55",
+      "bytes": 2968538
+    },
+    {
+      "path": "charts/library/_song_24700/1626096292.ogg",
+      "source": null,
+      "sha256": "0b0e9adb4050653c82e1bc69ae3d66f0898162ec758f12e19c6a6a5f229d7187",
+      "bytes": 3940610
+    },
+    {
+      "path": "charts/library/_song_24700/1685281304.mc",
+      "source": null,
+      "sha256": "cd15f0de2c37009d486d4160602061bb8e4bba21d8ee569573b7c9b3f02cdbaa",
+      "bytes": 93530
+    },
+    {
+      "path": "charts/library/_song_24700/cover.jpg",
+      "source": null,
+      "sha256": "80c6a9acb67a653f7761ea7e00588170381e58eba224459d707d52c6223a7d64",
+      "bytes": 359746
+    },
+    {
+      "path": "charts/library/_song_27520/1626500307.ogg",
+      "source": null,
+      "sha256": "4359023371235f18e4a6348b532de0ba3841a1842dfcc10fb36a3ef2b6d53aef",
+      "bytes": 2981466
+    },
+    {
+      "path": "charts/library/_song_27520/1658923119.mc",
+      "source": null,
+      "sha256": "360114aab14e77e15fc4b76908f351a44a9e09f19d1af37c4a2ed6815df76d16",
+      "bytes": 27956
+    },
+    {
+      "path": "charts/library/_song_27520/cover.jpg",
+      "source": null,
+      "sha256": "19cd2fe65acf6122777dd98b971970c5e6e124ebc4b44e2ac10d54ea7709dd06",
+      "bytes": 112918
+    },
+    {
+      "path": "charts/library/_song_29006/1657099593.ogg",
+      "source": null,
+      "sha256": "600e17bb2ba1342acdd59df497d8e2c5d084002982540a21774ff7c12ac1a5e2",
+      "bytes": 1706227
+    },
+    {
+      "path": "charts/library/_song_29006/1662285460.mc",
+      "source": null,
+      "sha256": "4dfb6988bf454bcfdc3acbdddf0c425df07b90d4eeff2035d3e8fed6d991546a",
+      "bytes": 27246
+    },
+    {
+      "path": "charts/library/_song_29006/cover.jpg",
+      "source": null,
+      "sha256": "b28219d77396e6cc52f64932a364e63b998f273a17f20e35c56670f3ba78daec",
+      "bytes": 113206
+    },
+    {
+      "path": "charts/library/_song_29047/1657808046.ogg",
+      "source": null,
+      "sha256": "7bfdbb5c1dce43d76217b3a582e390ccdb5b09f0bc3be5e32431f2f13595ed8d",
+      "bytes": 1832837
+    },
+    {
+      "path": "charts/library/_song_29047/1773501557.mc",
+      "source": null,
+      "sha256": "fd7108ed7ce266c0234358f08a9beeb68d76f92ccb0fb42b8f766f4e129d2dd1",
+      "bytes": 20433
+    },
+    {
+      "path": "charts/library/_song_29047/cover.jpg",
+      "source": null,
+      "sha256": "f3e051d351c3ecf6899fb325bcb9de23a8c9df43691367dd174c1b282b0852bc",
+      "bytes": 986112
+    },
+    {
+      "path": "charts/library/_song_29105/1648970126.ogg",
+      "source": null,
+      "sha256": "a0719443d8e6913cb75a438b0c3fda1e231b252dee4ecc223ff0bd343d40b4a0",
+      "bytes": 2654784
+    },
+    {
+      "path": "charts/library/_song_29105/1690359438.mc",
+      "source": null,
+      "sha256": "7ca5151f15d603a8b74bde92319256b2dc99f188c1f15208054c98f1cfbb4c81",
+      "bytes": 38239
+    },
+    {
+      "path": "charts/library/_song_29105/cover.jpg",
+      "source": null,
+      "sha256": "d0b558d67969891f03c5d011f6c712ee7a15e7381f524e5d9fbabe30999fd16d",
+      "bytes": 71591
+    },
+    {
+      "path": "charts/library/_song_29295/1773303421.ogg",
+      "source": null,
+      "sha256": "09159b5876e0cfb1c2ab87b2e77de5294bd9e16db9d04cadeb24acbc54c20b49",
+      "bytes": 3029678
+    },
+    {
+      "path": "charts/library/_song_29295/1774068202.mc",
+      "source": null,
+      "sha256": "e57f90e89ff3bb8ee79c5d219557670aab167dfe5d29e01e36e4dd7cca4f1bb2",
+      "bytes": 33760
+    },
+    {
+      "path": "charts/library/_song_29295/cover.jpg",
+      "source": null,
+      "sha256": "2d0384cf3ced6f049d4ec52e506b339a3a6d90594bb345ce1438cb62a2e1aa30",
+      "bytes": 1401646
+    },
+    {
+      "path": "charts/library/_song_29813/1667828060.ogg",
+      "source": null,
+      "sha256": "1cb18b7baa1294748e7ca2be5e4089029732a68d3cc0480096bdd95790da4ef6",
+      "bytes": 3475558
+    },
+    {
+      "path": "charts/library/_song_29813/1671399115.mc",
+      "source": null,
+      "sha256": "685cf7c5cf58b8caae322ea8e01b164012f1ad7bbab701262f8a9bb86bc742a0",
+      "bytes": 42155
+    },
+    {
+      "path": "charts/library/_song_29813/1671607969.mc",
+      "source": null,
+      "sha256": "677f40639a9c73162a23f262897267c02101c1c512705eaab30a27c72d874495",
+      "bytes": 34658
+    },
+    {
+      "path": "charts/library/_song_29813/1671628088.mc",
+      "source": null,
+      "sha256": "76fc7c9f8ee0122e8d740d2b67fb5afb08aa4b4700fcd7c5c18f1cde40587866",
+      "bytes": 21344
+    },
+    {
+      "path": "charts/library/_song_29813/cover.jpg",
+      "source": null,
+      "sha256": "a332b2b1016be6e1fc62025a40a2b07b5d56e83c73a58f0dceb3ee360d78812c",
+      "bytes": 1041272
+    },
+    {
+      "path": "charts/library/_song_30143/1730075477.mc",
+      "source": null,
+      "sha256": "dcef0235601424b9c6b1460f45567dde676e4198df2da125cc88df4f631caf72",
+      "bytes": 34716
+    },
+    {
+      "path": "charts/library/_song_30143/cover.jpg",
+      "source": null,
+      "sha256": "ae4e4bd36baf844d0f12f3fcb3724c2997f85961d9956e45d7594b69fb12d1c2",
+      "bytes": 170717
+    },
+    {
+      "path": "charts/library/_song_30143/Nyarlathotep's Dreamland.ogg",
+      "source": null,
+      "sha256": "35f858221f0623565c5ec14d65b41653344e60877cf85cb96027c50ffa4317a5",
+      "bytes": 3022729
+    },
+    {
+      "path": "charts/library/_song_32290/1699540514.mc",
+      "source": null,
+      "sha256": "ae3cf9724dcf61aefe7a9a7be1721f50c1bac90bd136a1c3678b85d2c3449224",
+      "bytes": 56706
+    },
+    {
+      "path": "charts/library/_song_32290/1699540514.ogg",
+      "source": null,
+      "sha256": "e90d2c8cc16c04a046d34048875cd5437a45e56163e4fc26d8e25590e6d85f84",
+      "bytes": 3937085
+    },
+    {
+      "path": "charts/library/_song_32290/1709875085.mc",
+      "source": null,
+      "sha256": "1891509697579180671f10c4bd0606f657a89526452df16d36fe3e7eacc374c2",
+      "bytes": 41851
+    },
+    {
+      "path": "charts/library/_song_32290/1722141031.mc",
+      "source": null,
+      "sha256": "76c5afe8d510f6fad18e61a973004152b4eaf037a29be04644a8d5b82144275b",
+      "bytes": 54134
+    },
+    {
+      "path": "charts/library/_song_32290/1750596090.mc",
+      "source": null,
+      "sha256": "3f15db9e6b7b44daca13ac97d8cfa2dcc729a435e3494636b15273dd1f7bf6b4",
+      "bytes": 67320
+    },
+    {
+      "path": "charts/library/_song_32290/cover.jpg",
+      "source": null,
+      "sha256": "f9763c3bd5b18c199e0c16bd8db91fa8ae10dee2adecdba89672fd7ecbaadf96",
+      "bytes": 587400
+    },
+    {
+      "path": "charts/library/_song_32447/1766381814.ogg",
+      "source": null,
+      "sha256": "5c6670416a1527642bc0d9859de775103b7dee4f5cfc3c272f7cab6b844ea60b",
+      "bytes": 7792043
+    },
+    {
+      "path": "charts/library/_song_32447/1766905084.mc",
+      "source": null,
+      "sha256": "70720bcd06e86e958066344fbefd15897364da00ac21002b62328178aa586404",
+      "bytes": 28605
+    },
+    {
+      "path": "charts/library/_song_32447/cover.jpg",
+      "source": null,
+      "sha256": "4031291a74a42860d3f7043e11a33cc9d2ff8d58d4fdaa9dc5e237e3f095a67d",
+      "bytes": 27170
+    },
+    {
+      "path": "charts/library/_song_33161/1713156012.ogg",
+      "source": null,
+      "sha256": "e33581e1894bcfa17724d8df62f49b2ac47c7a8be2bd19f727643239cc46aecc",
+      "bytes": 2394416
+    },
+    {
+      "path": "charts/library/_song_33161/1777513969.mc",
+      "source": null,
+      "sha256": "9f0e16c0cb62f44e4c9232345cb917668f19e56212c5d380c58436ce73b21aa2",
+      "bytes": 33853
+    },
+    {
+      "path": "charts/library/_song_33161/cover.jpg",
+      "source": null,
+      "sha256": "c25b98990648eacacec2109208aca5378f0480eb42a318772e093f0ceeb4f9cf",
+      "bytes": 1982360
+    },
+    {
+      "path": "charts/library/_song_33379/1717647332.ogg",
+      "source": null,
+      "sha256": "82c5b997b6b9079f0c9130369324f5d251fd86834903a1a2bf6a1c73e635fe5f",
+      "bytes": 3035220
+    },
+    {
+      "path": "charts/library/_song_33379/1717729250.mc",
+      "source": null,
+      "sha256": "4dc5889fa30b52e864f3ec3098575b21199fa7ef4a4ffe6924f6ba51761a7cc3",
+      "bytes": 37937
+    },
+    {
+      "path": "charts/library/_song_33379/cover.jpg",
+      "source": null,
+      "sha256": "39cfc5ce00c7a031ad4b8a6028532b21b7ffc05a511db7b20312ae9feb32d35e",
+      "bytes": 993556
+    },
+    {
+      "path": "charts/library/_song_33625/1715176904.mc",
+      "source": null,
+      "sha256": "c2d1d3396c3ce1de0eed8586a2f59ad2d406de876a26c94084802f0479287d1d",
+      "bytes": 41764
+    },
+    {
+      "path": "charts/library/_song_33625/1715176904.ogg",
+      "source": null,
+      "sha256": "5a453d71f1559d928904119dd73606b05d2e8343e9d2eb1a0c1132a600e0cb7b",
+      "bytes": 2241628
+    },
+    {
+      "path": "charts/library/_song_33625/cover.jpg",
+      "source": null,
+      "sha256": "7ab419837791c348a6399275e68eb2389f903d2be68fee19f8a56d0ca85213fc",
+      "bytes": 1707267
+    },
+    {
+      "path": "charts/library/_song_3394/cover.jpg",
+      "source": null,
+      "sha256": "3f28a0563047fad7dc6b1abcb18ea5c59cb95c927547dc4182dff7cf32e50669",
+      "bytes": 563438
+    },
+    {
+      "path": "charts/library/_song_3394/re_end_of_a_dream.ogg",
+      "source": null,
+      "sha256": "3e01c3a81924761fd2ee662af689644fcae797da55b0cf10728819bbcfa03af5",
+      "bytes": 3448565
+    },
+    {
+      "path": "charts/library/_song_3394/uma vs. Morimori Atsushi - ReEnd of a Dream (Critical_Star) [Hyper].mc",
+      "source": null,
+      "sha256": "96163eb863136e8e022817213fcf6ebcd877dd6efdef28db7140f963f8d3842a",
+      "bytes": 41201
+    },
+    {
+      "path": "charts/library/_song_3394/uma vs. Morimori Atsushi - ReEnd of a Dream (Critical_Star) [Normal].mc",
+      "source": null,
+      "sha256": "4417a390bd1854eac6b54288d0998f4d142321bb36608dcd4d46e5a91f710528",
+      "bytes": 22798
+    },
+    {
+      "path": "charts/library/_song_34244/1690356834.ogg",
+      "source": null,
+      "sha256": "09c1e5283691c759bdbe8191f15bac1938df2bd33ea764b610a479b7cde1b671",
+      "bytes": 2401254
+    },
+    {
+      "path": "charts/library/_song_34244/1766888119.mc",
+      "source": null,
+      "sha256": "79edc50b7c2d78daf5bb7b73c88914453550fd4743da4c83de89983c20b85d8f",
+      "bytes": 31398
+    },
+    {
+      "path": "charts/library/_song_34244/cover.jpg",
+      "source": null,
+      "sha256": "9af8a7286a3755f6099842b017460ef85bb5681e93883ad93d1ffa4640ae2381",
+      "bytes": 304268
+    },
+    {
+      "path": "charts/library/_song_35145/1740201019.ogg",
+      "source": null,
+      "sha256": "8d9c728c9adcd275a301d61e0cc3ebb60ff925fcf33fa2b63e2ff67d2ab7b844",
+      "bytes": 2938566
+    },
+    {
+      "path": "charts/library/_song_35145/1740201125.mc",
+      "source": null,
+      "sha256": "3f89df15bb71d8b8e28fc51ea1a127954fa35d524dbc049a7ba8a24b3a872928",
+      "bytes": 63412
+    },
+    {
+      "path": "charts/library/_song_35145/cover.jpg",
+      "source": null,
+      "sha256": "bf8641996aa56d91c350bb89cbd1a8843b8e8cd59b99b9177ab5a8d627b5f50d",
+      "bytes": 160462
+    },
+    {
+      "path": "charts/library/_song_35296/1744287727.ogg",
+      "source": null,
+      "sha256": "64f06a72b792c24f9e1c46d0dfaa45f172c338aa44aea10dec91276bdccd299d",
+      "bytes": 3721373
+    },
+    {
+      "path": "charts/library/_song_35296/1744504460.mc",
+      "source": null,
+      "sha256": "4e613d5fdf6967a0e949040fe52953214417fb6f665c971b3cda3afe35bb2748",
+      "bytes": 38097
+    },
+    {
+      "path": "charts/library/_song_35296/cover.jpg",
+      "source": null,
+      "sha256": "320aa9ed94de398d51441bbb6a56337faff1c79f2b05fb94bd65000644652d88",
+      "bytes": 709655
+    },
+    {
+      "path": "charts/library/_song_37364/boomushroom (with suno) - Malody is Fucked! (Boomushroom)[key](1).mc",
+      "source": null,
+      "sha256": "b2630262e813c984388841cc2425128e43f72040443150acc7293504db39231c",
+      "bytes": 28725
+    },
+    {
+      "path": "charts/library/_song_37364/cover.jpg",
+      "source": null,
+      "sha256": "5f581cf3e8e7da2c3bb1dbfb75a6388aa01dffd50a6bdaf4f600f2ec30394b9b",
+      "bytes": 442006
+    },
+    {
+      "path": "charts/library/_song_37364/Malody is Fucked!.ogg",
+      "source": null,
+      "sha256": "6ba07fab0980598a3f64f1b932681531dab272b08f96a7e8341a571b766fe257",
+      "bytes": 1679924
+    },
+    {
+      "path": "charts/library/_song_37560/1762063426.ogg",
+      "source": null,
+      "sha256": "adb1551adcad9dfa5bd50ba29fa9825eb9bf34357ed206c7f2ab5713821f2980",
+      "bytes": 2907176
+    },
+    {
+      "path": "charts/library/_song_37560/1762069716.mc",
+      "source": null,
+      "sha256": "de8b89885ad9aa554579e50449a0e9ac2678e1256f3eb533d7ec394f95db6cdb",
+      "bytes": 39431
+    },
+    {
+      "path": "charts/library/_song_37560/1762233635.mc",
+      "source": null,
+      "sha256": "714a3f6c45b21ebb6c2f04927c0ad6dcacb6a8c6924e976b098bd0f229381f82",
+      "bytes": 29701
+    },
+    {
+      "path": "charts/library/_song_37560/cover.jpg",
+      "source": null,
+      "sha256": "6f8c93c7e72695db6dee86104fa34438ddacf09c3381bfd0631c6fe6bff91ed5",
+      "bytes": 1533946
+    },
+    {
+      "path": "charts/library/_song_37959/1765639637.ogg",
+      "source": null,
+      "sha256": "78e4c810cd990ad845c21d1d1062361e17082a4c9149c0e5c67470955d21e86e",
+      "bytes": 2773319
+    },
+    {
+      "path": "charts/library/_song_37959/1779505874.mc",
+      "source": null,
+      "sha256": "d5893713ad7404fe814143bf9f3ed4401cdc98c474912f5d66271ddff5bdc172",
+      "bytes": 26855
+    },
+    {
+      "path": "charts/library/_song_37959/cover.jpg",
+      "source": null,
+      "sha256": "f3969acf6e98530280a638ec0da549186482eb5dcd63210dc168f38865c9e844",
+      "bytes": 565434
+    },
+    {
+      "path": "charts/library/_song_38411/1768565792.ogg",
+      "source": null,
+      "sha256": "e002b14edda0ce437b64008f30b7ef402c526d3ca4a0059a6b048cfb97fe4bc3",
+      "bytes": 2297506
+    },
+    {
+      "path": "charts/library/_song_38411/1775227626.mc",
+      "source": null,
+      "sha256": "c4c4d72dcd29d8daea3cdb7c240c152354f06d4760dafa249c5a46e83afebc84",
+      "bytes": 28017
+    },
+    {
+      "path": "charts/library/_song_38411/cover.jpg",
+      "source": null,
+      "sha256": "cdb82d7d7128e0049b865f97577e6946c15dd2c0cdd00c0b00fbc2c7869f51f2",
+      "bytes": 522345
+    },
+    {
+      "path": "charts/library/_song_38521/1770302075.ogg",
+      "source": null,
+      "sha256": "ff3391dc81f4624bc8ae54e6a6ee0106fec84c054fdb6be2496712acfa207384",
+      "bytes": 1694270
+    },
+    {
+      "path": "charts/library/_song_38521/1770302080.mc",
+      "source": null,
+      "sha256": "a5bebf09065602601a68c0dab363f2065948078b9bcb7b78342bbf6cd44c8033",
+      "bytes": 37347
+    },
+    {
+      "path": "charts/library/_song_38521/cover.png",
+      "source": null,
+      "sha256": "e8030acd2165edd0704dc0d5890e2530b53892463e50c0535b29ace91beda182",
+      "bytes": 1071000
+    },
+    {
+      "path": "charts/library/_song_38985/1772988430.ogg",
+      "source": null,
+      "sha256": "70be2ae4391c6051d4ba5681528443f2fcefb6a8bc51fb610a4881f1599cb189",
+      "bytes": 3022258
+    },
+    {
+      "path": "charts/library/_song_38985/1773483078.mc",
+      "source": null,
+      "sha256": "2ab43b36bcb4ecdcc088245be470b24ffbf3d5cba38dd86dd16896d3b3c28289",
+      "bytes": 30450
+    },
+    {
+      "path": "charts/library/_song_38985/cover.jpg",
+      "source": null,
+      "sha256": "1339992dd0e46883b774f67876e4c5dac7d6001fa4364b323ea4dc30e100dad5",
+      "bytes": 385473
+    },
+    {
+      "path": "charts/library/_song_39117/1774101309.ogg",
+      "source": null,
+      "sha256": "f3461db9853d1177c99bfe60488b02bf476c66ee0cd369263d1e389624c8f58e",
+      "bytes": 1767992
+    },
+    {
+      "path": "charts/library/_song_39117/1777721119.mc",
+      "source": null,
+      "sha256": "b904d05c30927626f2fb7d62a944561e2be23d5c351d26614764ba9f1c4d088a",
+      "bytes": 26643
+    },
+    {
+      "path": "charts/library/_song_39117/cover.png",
+      "source": null,
+      "sha256": "fe4e827875d730f02b153a6a4350f9787e3c76da8bdd717d52d3706418f77cd2",
+      "bytes": 580961
+    },
+    {
+      "path": "charts/library/_song_39177/1775022413.mc",
+      "source": null,
+      "sha256": "7b915e7d65163cd19c98fe270cb5bb945024391c68938572feae4f8916fdf823",
+      "bytes": 72458
+    },
+    {
+      "path": "charts/library/_song_39177/1775022413.ogg",
+      "source": null,
+      "sha256": "e7cb83a49f679b14bf68662e5259f8e885a37dce1aabfa8f78c8970df2a29655",
+      "bytes": 5530307
+    },
+    {
+      "path": "charts/library/_song_39177/cover.jpg",
+      "source": null,
+      "sha256": "e36a0f1a703f77a121b52360461568a7876947ccd54b8916fa725cf10cac0040",
+      "bytes": 107846
+    },
+    {
+      "path": "charts/library/_song_39188/1775018862.ogg",
+      "source": null,
+      "sha256": "58a2b5d245476bc0c0aaf0f312bb33b3e0fb881593f32f910d1f555aa12e6f78",
+      "bytes": 2846221
+    },
+    {
+      "path": "charts/library/_song_39188/1775095351.mc",
+      "source": null,
+      "sha256": "6fc98e9b7c8362fac19650223f6ca422633c906bb9d25f7720377a1c2c5f70b8",
+      "bytes": 116722
+    },
+    {
+      "path": "charts/library/_song_39188/cover.jpg",
+      "source": null,
+      "sha256": "8a9b84eca6e57e21dea07a515a88074bbaae2f5e72f3ffad961cc02465894ffa",
+      "bytes": 1660874
+    },
+    {
+      "path": "charts/library/_song_39357/1776430241.mc",
+      "source": null,
+      "sha256": "57ab1ed4b4cde642d5602e9ac8a432c275e6459dd3ecf8621fe9798a21a09d98",
+      "bytes": 137827
+    },
+    {
+      "path": "charts/library/_song_39357/Cave2377 - [Reg1-Map4] Tsunomaki Watame - KING.ogg",
+      "source": null,
+      "sha256": "6f7edb86bb88672bd6b614328fb98dc7a8147b8eaa9d0392415f0c5e5f243c0b",
+      "bytes": 1961469
+    },
+    {
+      "path": "charts/library/_song_39357/cover.jpg",
+      "source": null,
+      "sha256": "951f7de1aca2727165430b68942b92ac95b8edf44d015f29bf8eb5144db8ce55",
+      "bytes": 697487
+    },
+    {
+      "path": "charts/library/_song_4448/cover.jpg",
+      "source": null,
+      "sha256": "d15a2e0d9fdbe8e84f7b00594e87fc216a3d65e909ed29fb0158476d2e366e26",
+      "bytes": 161842
+    },
+    {
+      "path": "charts/library/_song_4448/Mujinku-Vacuum Track#ADD8E6- (4K Beginner).mc",
+      "source": null,
+      "sha256": "6fe8e8c8227383b48569c313419242c3dbcc1010e7269acb974b75391567cb9e",
+      "bytes": 23193
+    },
+    {
+      "path": "charts/library/_song_4448/Mujinku-Vacuum Track#ADD8E6-.ogg",
+      "source": null,
+      "sha256": "092cfbc9c86efa5bd54c6c4ba47a44af2015aaa5592b2e86d0250652455e26c8",
+      "bytes": 3808872
+    },
+    {
+      "path": "charts/library/_song_4448/NoKANY - No man's land -VacuumTrack#ADD8E6- (-[Apple]-) [Bie's VOID].mc",
+      "source": null,
+      "sha256": "46cb750e7b1919b755edb073308a2081852314df0e53c9d7cb5677cc4f8e7859",
+      "bytes": 82307
+    },
+    {
+      "path": "charts/library/_song_4448/NoKANY - No man's land -VacuumTrack#ADD8E6- (-[Apple]-) [ExNeko's Normal].mc",
+      "source": null,
+      "sha256": "9cb820a07a57651d4dcc3bd4780bb9028efbb1ffa06781ee13a7f6e4b0e3f024",
+      "bytes": 53648
+    },
+    {
+      "path": "charts/library/_song_4448/NoKANY - No man's land -VacuumTrack#ADD8E6- (-[Apple]-) [HXJ's Hyper].mc",
+      "source": null,
+      "sha256": "0fcfe904a04f699015da20d1859a7191e1e16591429127b4fc456bd4e7376b2d",
+      "bytes": 80153
+    },
+    {
+      "path": "charts/library/_song_4786/1618377601.mc",
+      "source": null,
+      "sha256": "6782575f072b7c69f4ecc32c27a4dfc6de719d478af33d348982748635707865",
+      "bytes": 29572
+    },
+    {
+      "path": "charts/library/_song_4786/cover.jpg",
+      "source": null,
+      "sha256": "99bb5a3a209d696d381d54a7c2e7940b3df734f2d51df20c66efa693d484ab6a",
+      "bytes": 569579
+    },
+    {
+      "path": "charts/library/_song_4786/Titania.ogg",
+      "source": null,
+      "sha256": "4f094b838eb61597bb12217b06c0ad9de357dfedafac67106c942c48f712cdd8",
+      "bytes": 2449760
+    },
+    {
+      "path": "charts/library/_song_4900/1520670127.mc",
+      "source": null,
+      "sha256": "8b707c507a0ba5c15ed10e757529810083ce731949904a5e471195ca5c8589a7",
+      "bytes": 100385
+    },
+    {
+      "path": "charts/library/_song_4900/cover.jpg",
+      "source": null,
+      "sha256": "d7c7892e6339c5919b2dceac04ecabd055026403fa10330680284bac01656c85",
+      "bytes": 247673
+    },
+    {
+      "path": "charts/library/_song_4900/Key4Beginner.mc",
+      "source": null,
+      "sha256": "29d2819f04b6c4a6af24e827a1ff796b7c6a8ca7c8ac0c98a0e5646994be64fd",
+      "bytes": 17733
+    },
+    {
+      "path": "charts/library/_song_4900/Key4Hyper.mc",
+      "source": null,
+      "sha256": "0432573f5616621d95496048be70ef3ca641551995cbb910784814fccd728eb2",
+      "bytes": 54668
+    },
+    {
+      "path": "charts/library/_song_4900/Key4Normal.mc",
+      "source": null,
+      "sha256": "bdc974fa0941f370b6752f5c7b937d17a89425a19633180053622ccdf6940326",
+      "bytes": 34331
+    },
+    {
+      "path": "charts/library/_song_4900/Latitude.ogg",
+      "source": null,
+      "sha256": "dad6ec9d9453ab6792e845a467325c8fd374a4fa999f98e86e0a56191dc65698",
+      "bytes": 3396192
+    },
+    {
+      "path": "charts/library/_song_5000/00th Dan v3 (M.D.C.E Team).mc",
+      "source": null,
+      "sha256": "7a2c0810fed3bf372d7cacc0ff9d5d574808fa5ffb8f8f6204cc7d75895db796",
+      "bytes": 84905
+    },
+    {
+      "path": "charts/library/_song_5000/01st Dan v3 (M.D.C.E Team).mc",
+      "source": null,
+      "sha256": "1071e6ed389b2670475aed712112e21d83249ab3e3ed343077b73fd638306838",
+      "bytes": 118208
+    },
+    {
+      "path": "charts/library/_song_5000/02nd Dan v3 (M.D.C.E Team).mc",
+      "source": null,
+      "sha256": "68d606088e8847dc1cb9ca71c37028247cbda83e1ff0e59e21710f1c3f7511bb",
+      "bytes": 157516
+    },
+    {
+      "path": "charts/library/_song_5000/03rd Dan v3 (M.D.C.E Team).mc",
+      "source": null,
+      "sha256": "52ed0c8d39ecf514b55341c300a5b732846a8e672da4b74105536128484c01dc",
+      "bytes": 192543
+    },
+    {
+      "path": "charts/library/_song_5000/cover.jpg",
+      "source": null,
+      "sha256": "04f08b180cd8b882173807226ff1ad57fb945503bd7456a461433c61a5da0684",
+      "bytes": 1657411
+    },
+    {
+      "path": "charts/library/_song_5000/Ma-0.ogg",
+      "source": null,
+      "sha256": "27543e1fe3353c1e1d076281fd2cf2ccd9e6cdbf45ad77fec94c6d5d6bc1a7a1",
+      "bytes": 8768307
+    },
+    {
+      "path": "charts/library/_song_5000/Ma-1.ogg",
+      "source": null,
+      "sha256": "504556f31fa77b52239644dd3a97bbd40e7af7c0ac2fbf443ec472f3b08a13ab",
+      "bytes": 8852954
+    },
+    {
+      "path": "charts/library/_song_5000/Ma-2.ogg",
+      "source": null,
+      "sha256": "71bb0a8f4c01478abd46ece62cf5e1666c10a2bbd60721357f82b89c384f2f14",
+      "bytes": 9502081
+    },
+    {
+      "path": "charts/library/_song_5000/Ma-3.ogg",
+      "source": null,
+      "sha256": "95212ce0a593b1dc1887abd26fbc1b6a756175f06fb43296d19c43bd76bb8bee",
+      "bytes": 11040925
+    },
+    {
+      "path": "charts/library/_song_7269/1534234713.ogg",
+      "source": null,
+      "sha256": "ef8ff3a33963a989070c30abc5de68746a409935040c82d0c32a48fe1ad8f594",
+      "bytes": 3134414
+    },
+    {
+      "path": "charts/library/_song_7269/1567345927.mc",
+      "source": null,
+      "sha256": "7ec7b3c231aa8d8a74a186a046e8eacc568121695e77bce3c16e9172fc81b285",
+      "bytes": 45556
+    },
+    {
+      "path": "charts/library/_song_7269/4K Normal.mc",
+      "source": null,
+      "sha256": "d2e6c3af0213414b0cd37b3d067090a1dfcb653012891f6fe7dacef1fafe353a",
+      "bytes": 21907
+    },
+    {
+      "path": "charts/library/_song_7269/cover.jpg",
+      "source": null,
+      "sha256": "644cc4e59588a2c1d571a5f31b23941280aa82c39610b4c165584c6c5b9ff9a6",
+      "bytes": 29673
+    },
+    {
+      "path": "charts/library/_song_9106/cover.jpg",
+      "source": null,
+      "sha256": "280dafc5e70c7e64029c17a631c2f95f8257d4c820a1cf3e74e0d9d6861354fe",
+      "bytes": 131950
+    },
+    {
+      "path": "charts/library/_song_9106/Sterelogue (4ky_alterego).mc",
+      "source": null,
+      "sha256": "563e74365559664f82b7c503d05154a9d455a5d51ab474109543a83e1ff63d0a",
+      "bytes": 34901
+    },
+    {
+      "path": "charts/library/_song_9106/Sterelogue (4ky_another).mc",
+      "source": null,
+      "sha256": "9ffce4819a12a5656503ab00e45e403f68eb41edbd74454a8b46e29e90adf2a2",
+      "bytes": 36814
+    },
+    {
+      "path": "charts/library/_song_9106/Sterelogue (4ky_beginner).mc",
+      "source": null,
+      "sha256": "4d3ce1ba0412839d800d61035acd263a2f3d9b6caaaeee1a8edc3cc52e3a6b79",
+      "bytes": 6136
+    },
+    {
+      "path": "charts/library/_song_9106/Sterelogue (4ky_hyper).mc",
+      "source": null,
+      "sha256": "69daeec10e7c1a389b4ce025fcf42257a7f8e9be1b317c8201053306e830376f",
+      "bytes": 24331
+    },
+    {
+      "path": "charts/library/_song_9106/Sterelogue (4ky_normal).mc",
+      "source": null,
+      "sha256": "cbb8b0c3dc43392f217bdd85be8264d555dda8a4aaa053b8273358127568faa3",
+      "bytes": 13408
+    },
+    {
+      "path": "charts/library/_song_9106/VeetaCrush - Sterelogue.ogg",
+      "source": null,
+      "sha256": "1b357c52515b0578d54d40f13538ce09c1f1816c643f2837360db48d0cf7650f",
+      "bytes": 3937282
+    },
+    {
+      "path": "charts/library/_song_9160/1565767011.mc",
+      "source": null,
+      "sha256": "acfc3905aa08d2d476cc5e0be272b6245f8a02df4cdedbc896a626bc2835c3c0",
+      "bytes": 33624
+    },
+    {
+      "path": "charts/library/_song_9160/1565767011.ogg",
       "source": null,
       "sha256": "524184bcfea2c6e9236af3f53570e46f51607cc391f5bd79c16b008bac7b3e91",
       "bytes": 3076761
     },
     {
-      "path": "charts/default/1565787429.mc",
+      "path": "charts/library/_song_9160/1565787429.mc",
       "source": null,
       "sha256": "2cde71f62e66ae7e64cd79a1f3f83778302c615cb6cd35acad329e9130d0e1af",
       "bytes": 25045
+    },
+    {
+      "path": "charts/library/_song_9160/cover.jpg",
+      "source": null,
+      "sha256": "b4289d578e9003a429e465773f22b396ab2c87751f36e9a95394218c9838826c",
+      "bytes": 616215
+    },
+    {
+      "path": "charts/library/_song_978/cover.png",
+      "source": null,
+      "sha256": "b582636a43cf3a4eab2c981878554640c1f5cadd309fcc571daeb81de19aea8b",
+      "bytes": 79767
+    },
+    {
+      "path": "charts/library/_song_978/iowo-DREAM-KEY BEGINNER LV..mc",
+      "source": null,
+      "sha256": "510ad77faaaaddab946a39edd45670e2f8d7dcb0c8ab95a71446c7f8a8e8ebe7",
+      "bytes": 31864
+    },
+    {
+      "path": "charts/library/_song_978/song-bg.ogg",
+      "source": null,
+      "sha256": "1913c462221c7295ffcc60428600434ee40eb26b224e9a01bd4e557fd00a4976",
+      "bytes": 1989191
+    },
+    {
+      "path": "charts/library/_temp_1780215295/【逐帧纸绘MV】Nanatsukaze - 五月猫 ^._.^_音频.ogg",
+      "source": null,
+      "sha256": "9fc0ad83ec3cb99e72da3956232dcd7b22fa69da21d634ca720b5f721c7e0341",
+      "bytes": 4013491
+    },
+    {
+      "path": "charts/library/_temp_1780215295/1780215295.mc",
+      "source": null,
+      "sha256": "6012c90c7242df381404e2827ee899f974dec0d7f9bc125a33fb87334cfcaed3",
+      "bytes": 3962
+    },
+    {
+      "path": "charts/library/_temp_1780215295/1780215295.ogg",
+      "source": null,
+      "sha256": "67526f781e14a70a7d3935a110aad4daa1a3c4a477cc056721955dd02771ec6c",
+      "bytes": 4154888
+    },
+    {
+      "path": "charts/library/_temp_1780215295/1780224221.mc",
+      "source": null,
+      "sha256": "054a047cfbe1cfd0f453fed89c14352d9d725b5dfb586b190a76bdda76e911bb",
+      "bytes": 7411
+    },
+    {
+      "path": "charts/library/cover-fallback.svg",
+      "source": null,
+      "sha256": "5bd423ef0156e360ca5ece24fef453a3b1509ae7121d82c56163c783ebdb3596",
+      "bytes": 356
     },
     {
       "path": "gifts/bee.glb",
@@ -126,14 +1074,20 @@
     {
       "path": "index.html",
       "source": "https://nailong-dance.pages.dev/",
-      "sha256": "60c9b84a6aae16e35e3d251c6a2b1aa6e491edd9112db461952aa179f9a1a153",
-      "bytes": 18341
+      "sha256": "6ceabd27855605451833212859c516e64c09bfec1d73e3d302aab1ce7873c809",
+      "bytes": 18936
     },
     {
       "path": "js/audio.js",
       "source": "https://nailong-dance.pages.dev/js/audio.js",
-      "sha256": "049da917ea2720fb050d9eb7299351a5641ec27cea6318eb2696ead599865576",
-      "bytes": 20550
+      "sha256": "be2d031c025719a4ffa104bc80f3d03f9542edb269954ab5d180121eda99867b",
+      "bytes": 20478
+    },
+    {
+      "path": "js/calibration.js",
+      "source": null,
+      "sha256": "fc4478d9ddc5f2b714ff42e7e8808a637262378bc4d3306470bf5feee26330be",
+      "bytes": 3028
     },
     {
       "path": "js/customstore.js",
@@ -156,26 +1110,32 @@
     {
       "path": "js/game.js",
       "source": "https://nailong-dance.pages.dev/js/game.js",
-      "sha256": "b457151b099b422afedc24ce9b8f24ce99e7ad07f06865fc67d89f1f613252f1",
-      "bytes": 16181
+      "sha256": "17a5658e73579cb6160fd662efc6183c926b26da37b4296e4d6a265888480244",
+      "bytes": 16493
     },
     {
       "path": "js/keybindings.js",
       "source": null,
-      "bytes": 933,
-      "sha256": "5a8d8f9f41f714807db3b46d1e83129eedf7980f30d23a0d8e0f2c44364210a1"
+      "sha256": "5a8d8f9f41f714807db3b46d1e83129eedf7980f30d23a0d8e0f2c44364210a1",
+      "bytes": 933
+    },
+    {
+      "path": "js/library.js",
+      "source": null,
+      "sha256": "59196af68d5660081a49bd6550a06675a3c9ae75cd68b03ea5ea05a4bd07ea2e",
+      "bytes": 41485
     },
     {
       "path": "js/main.js",
       "source": "https://nailong-dance.pages.dev/js/main.js",
-      "sha256": "afcdcb5115aac9c602e87d4a64bd4b19b0ffc0812546941df11323d79fbfb8ed",
-      "bytes": 26520
+      "sha256": "d0a7a25a43a2e394cb7275ba9c1a39d964a60e68ddce218bd700a9e0f26f7514",
+      "bytes": 26491
     },
     {
       "path": "js/malody.js",
       "source": null,
-      "sha256": "873b63ea936fd1cf3d1c1535416942803856a43238009270e2de9b1de976a6a4",
-      "bytes": 5402
+      "sha256": "fd2a591d250e4a07c49c73426a20954ba2ab3e680ab1c877c4fc19adc9fdcd8f",
+      "bytes": 5548
     },
     {
       "path": "js/opening.js",
@@ -186,8 +1146,8 @@
     {
       "path": "js/ui.js",
       "source": "https://nailong-dance.pages.dev/js/ui.js",
-      "sha256": "587a34b995d408f30eb29453fb2c992aaf399725d325fb18550ded6ea7c8e823",
-      "bytes": 68288
+      "sha256": "9fa32b284cd78ea908ec54e97895f4c1c30db6d67ca92d2c5fe6e62dad604571",
+      "bytes": 76006
     },
     {
       "path": "package.json",
@@ -198,8 +1158,8 @@
     {
       "path": "README.md",
       "source": null,
-      "sha256": "31fd013ed6693b57b969b2748f638eb05bfc011f592dcb1fce7ca5ac1d44b3fa",
-      "bytes": 5914
+      "sha256": "ab7c95e8ab3b1c4c78c78b778eadfd30efc9911069a5be5adff8b3003d91a72a",
+      "bytes": 7436
     },
     {
       "path": "rigged.glb",
@@ -210,8 +1170,8 @@
     {
       "path": "server.mjs",
       "source": null,
-      "sha256": "1163b408869fe941f32f611ad5aee4a94b08b65f1830148366172842f67dc11f",
-      "bytes": 2285
+      "sha256": "0cf3868b1a342e83619f179d764e105d2a7dbacad89ef1c72352fecf9951237b",
+      "bytes": 2374
     },
     {
       "path": "sounds/voice-1.mp3",
@@ -246,14 +1206,26 @@
     {
       "path": "style.css",
       "source": "https://nailong-dance.pages.dev/style.css",
-      "sha256": "c99019de53cb684c6b38ae5b83c470ec663f36b4b2c922e5a00dfccd26e89346",
-      "bytes": 52299
+      "sha256": "51abff67d08757fde7f67239ec17ce8bfb58bdf24479dc0c245e1ce82347183b",
+      "bytes": 56692
+    },
+    {
+      "path": "tests/calibration.test.mjs",
+      "source": null,
+      "sha256": "76f03d2bd773cc2ec5de263020030e9ca7eb6b200f6552e70110e4fe5a16edb8",
+      "bytes": 1789
+    },
+    {
+      "path": "tests/library.test.mjs",
+      "source": null,
+      "sha256": "c34ca69251951b81b90ffbff3aafbad5651ce672408d9eae73d8cc2c8c28677e",
+      "bytes": 2088
     },
     {
       "path": "tests/malody.test.mjs",
       "source": null,
-      "sha256": "e6a3f5423739f18243858900ee36fc266a4fa7005f3402438b4623c9e481c5af",
-      "bytes": 4942
+      "sha256": "b381add272f8a3436819e6eebe2244217bf92c5c6bc81c0fb929b90465e88fbe",
+      "bytes": 5412
     },
     {
       "path": "vendor/three/addons/loaders/GLTFLoader.js",

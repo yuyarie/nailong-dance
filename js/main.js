@@ -89,9 +89,9 @@ addEventListener('dancer-progress', _0x1234b6 => {
   const _0x106f0b = _0x1234b6.detail;
   $("loadBar").style.width = 0x5 + _0x106f0b * 0.55 + '%', $("loadSub").textContent = '舞者模型下载中\x20' + _0x106f0b + '%';
 });
-Music.el.addEventListener("canplaythrough", () => console.log("[启动] ✓ 背景音乐 默认曲目 已就绪"), {
+Music.el.addEventListener("canplaythrough", () => console.log("[启动] ✓ 所选歌曲 已就绪"), {
   'once': true
-}), Music.el.addEventListener("error", () => console.warn('[启动]\x20⚠\x20背景音乐\x20默认曲目\x20加载失败，游戏可照常进行'), {
+}), Music.el.addEventListener("error", () => console.warn('[启动]\x20⚠\x20所选歌曲\x20加载失败，游戏可照常进行'), {
   'once': true
 });
 const main = {

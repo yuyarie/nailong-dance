@@ -2,7 +2,7 @@
 export function beatValue(beat) {
   if (!Array.isArray(beat) || beat.length !== 3 || !beat.every(Number.isFinite) ||
       !Number.isInteger(beat[0]) || !Number.isInteger(beat[1]) ||
-      !Number.isInteger(beat[2]) || beat[2] <= 0 || beat[1] < 0 || beat[1] >= beat[2]) {
+      !Number.isInteger(beat[2]) || beat[2] <= 0 || beat[1] < 0) {
     throw new Error('谱面包含无效的拍点');
   }
   return beat[0] + beat[1] / beat[2];
@@ -31,14 +31,17 @@ export function parseMalody(input) {
     for (const next of timing) { if (next.beat > beat) break; point = next; }
     return point.seconds + (beat - point.beat) * 60 / point.bpm;
   };
-  const backgrounds = raw.note.filter(note => note.column === undefined && note.type === 1 && note.sound);
+  // Older Malody exports store the BGM event in the extra (fifth) column.
+  const isBackground = note => note.type === 1 && note.sound &&
+    (note.column === undefined || note.column === 4 || note.isBgm === true);
+  const backgrounds = raw.note.filter(isBackground);
   if (backgrounds.length !== 1) throw new Error('需要包含一条背景音乐事件的谱面');
   const audio = backgrounds[0];
   const offset = audio.offset ?? 0;
   if (!Number.isFinite(offset)) throw new Error('谱面音频偏移无效');
   // Malody offset delays BGM against the chart; convert to audio playback seconds.
   const audioStart = secondsAt(beatValue(audio.beat)) + offset / 1000;
-  const notes = raw.note.filter(note => note.column !== undefined).map(note => {
+  const notes = raw.note.filter(note => note.column !== undefined && !isBackground(note)).map(note => {
     if (!Number.isInteger(note.column) || note.column < 0 || note.column > 3) {
       throw new Error('音符轨道必须为 0 至 3');
     }
@@ -60,7 +63,7 @@ export function parseMalody(input) {
     bpm: timing[0].bpm, name: String(raw.meta.song?.title || '未命名曲目'),
     artist: String(raw.meta.song?.artist || '未知歌手'),
     version: String(raw.meta.version || '4Key'), creator: String(raw.meta.creator || ''),
-    previewStart: Number.isFinite(raw.meta.preview) ? Math.max(0, secondsAt(raw.meta.preview) - audioStart) : 0,
+    previewStart: Number.isFinite(raw.meta.preview) ? Math.max(0, raw.meta.preview / 1000) : 0,
     endTime: notes.reduce((end, note) => Math.max(end, note.t + note.len), -Infinity)
   };
 }

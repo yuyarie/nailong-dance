@@ -1,8 +1,10 @@
+import { LIBRARY_CHARTS } from './library.js';
 import { Music, setSfxEnabled, sfxClick, sfxCoin, sfxMiss, ensureCtx, setMenuBgmVolume, setVoiceVolume, Preview } from "./audio.js";
 import { Game, pauseGame } from "./game.js";
 import { parseMalody, importMalodyFiles } from "./malody.js";
 import { CustomStore } from "./customstore.js";
 import { DEFAULT_KEYS, normalizeKeys, isBindableKey, keyLabel } from './keybindings.js';
+import { createCalibration } from './calibration.js';
 const KEY = 'naiwa_dance_local_save_v1',
   DEFAULTS = {
     'coins': 0x15e,
@@ -638,11 +640,7 @@ export const ACCESSORIES = [{
   'icon': '🌈',
   'color': 0xff66cc
 }];
-export const SONGS = [{
-  id: 'default', name: 'ニニ', artist: 'テヅカxQayo',
-  file: 'charts/default/1565767011.ogg', chartFile: 'charts/default/1565787429.mc',
-  bpm: 174, version: '4K Normal Lv.17', desc: '4K Normal Lv.17 · 773 notes · 64 长条', previewStart: 103.104
-}];
+export const SONGS = LIBRARY_CHARTS;
 const ACHS = [{
   'id': 'first',
   'ic': '🕺',
@@ -1157,7 +1155,7 @@ const ACHS = [{
 }];
 let sel = {
     'diff': "chart",
-    'song': "default"
+    'song': SONGS[0].id
   },
   mainRef = null;
 export function initUI(_0x35588b) {
@@ -1185,8 +1183,6 @@ export function initUI(_0x35588b) {
     sfxClick(), startShow();
   }), document.getElementById('btnBackHome').addEventListener("click", () => {
     sfxClick(), showScreen("scr-home"), renderHome();
-  }), document.getElementById("btnStart").addEventListener("click", () => {
-    sfxClick(), ensureCtx(), startShow();
   });
   const _0x43727c = document.getElementById('btnPlayBack');
   if (_0x43727c) _0x43727c.addEventListener("click", () => {
@@ -1245,6 +1241,7 @@ export function initUI(_0x35588b) {
   };
 }
 export function showScreen(_0x530cd8) {
+  if (_0x530cd8 !== 'scr-set') stopCalibration();
   if (curScr === 'scr-play' && _0x530cd8 !== "scr-play") stopPreview();
   curScr = _0x530cd8, document.querySelectorAll(".screen").forEach(_0x8fcca8 => _0x8fcca8.classList.toggle("cur", _0x8fcca8.id === _0x530cd8)), document.querySelectorAll("#mainNav button").forEach(_0xa99b69 => _0xa99b69.classList.toggle("cur", _0xa99b69.dataset.scr === _0x530cd8)), requestAnimationFrame(updateQuickScroll);
 }
@@ -1320,24 +1317,73 @@ export function renderHome() {
   }
 }
 function allChartSongs() { return [...SONGS, ...(Store.data.chartSongs || [])]; }
+let detailGroupId = null, libraryScrollTop = 0;
+function chartGroupId(chart) { return chart.groupId || 'import:' + chart.name + ':' + chart.artist; }
+function chartLevelLabel(chart) {
+  const level = chart.level ?? chart.version?.match(/(?:Lv\.?|Level\s*)(\d+(?:\.\d+)?)/i)?.[1];
+  return level != null ? 'Lv' + level : chart.version || '4Key';
+}
 function renderPlay() {
-  document.getElementById('playKeyTip').textContent = Store.data.set.keys.map((code, index) => 'key' + (index + 1) + ': ' + keyLabel(code)).join(' · ') + ' · 长条按住至结束 · 设置中可修改键位和判定延迟';
-  const grid = document.getElementById('songGrid');
-  grid.innerHTML = '';
-  const query = songQ.trim().toLowerCase();
-  const songs = allChartSongs().filter(song => (song.name + ' ' + song.artist + ' ' + (song.version || '')).toLowerCase().includes(query));
-  for (const song of songs) {
-    const card = document.createElement('div');
-    card.className = 'theme-card song-card' + (sel.song === song.id ? ' sel' : '');
-    card.style.background = song.chartFile ? 'linear-gradient(135deg,#7a4dffcc,#36d1ffcc)' : 'linear-gradient(135deg,#ff6b6bcc,#ffa751cc)';
-    card.innerHTML = '<div class="tname">🎵 ' + escHtml(song.name) + '</div><div class="tdesc">' + escHtml(song.artist) + ' · ' + song.bpm + ' BPM<br>' + escHtml(song.desc) + '</div><div class="cs-actions"><button class="pv-btn' + (pvSongId === song.id ? ' on' : '') + '" data-pv="' + song.id + '">' + (pvSongId === song.id ? '⏸ 正在播放' : '▶ 试听') + '</button>' + (song.chartFile ? '' : '<button class="cs-del" title="删除谱面">🗑</button>') + '</div>' + (sel.song === song.id ? '<span class="tag">✓ 已选</span>' : '');
-    card.onclick = () => { sfxClick(); stopPreview(); sel.song = song.id; renderPlay(); };
-    card.querySelector('[data-pv]').onclick = event => { event.stopPropagation(); previewSong(song); };
-    const del = card.querySelector('.cs-del');
-    if (del) del.onclick = async event => { event.stopPropagation(); await deleteChart(song); };
-    grid.appendChild(card);
+  const grid = document.getElementById('songGrid'), detail = document.getElementById('songDetails');
+  grid.innerHTML = ''; detail.innerHTML = '';
+  const groups = new Map();
+  for (const chart of allChartSongs()) {
+    const id = chartGroupId(chart);
+    if (!groups.has(id)) groups.set(id, []);
+    groups.get(id).push(chart);
   }
-  if (!songs.length) grid.innerHTML = '<div class="rank-empty">没有匹配的谱面</div>';
+  for (const charts of groups.values()) charts.sort((a, b) => (a.level ?? Infinity) - (b.level ?? Infinity) || a.version.localeCompare(b.version));
+  if (!groups.has(detailGroupId)) detailGroupId = null;
+  document.getElementById('libraryBrowse').hidden = !!detailGroupId;
+  document.getElementById('libraryHeader').hidden = !!detailGroupId;
+  detail.hidden = !detailGroupId;
+  if (detailGroupId) {
+    const charts = groups.get(detailGroupId), song = charts.find(item => item.id === sel.song) || charts[0];
+    detail.innerHTML = '<button class="btn-back" id="btnLibraryBack">← 返回曲库</button><div class="song-detail-head"><img class="library-cover" alt="' + escHtml(song.name) + ' 封面" src="' + escHtml(song.cover || 'charts/library/cover-fallback.svg') + '"><div><h2>' + escHtml(song.name) + '</h2><div class="library-artist">' + escHtml(song.artist) + '</div><div class="library-count">4KEY · ' + charts.length + ' 张谱面</div><button class="pv-btn' + (pvSongId === song.id ? ' on' : '') + '" data-pv="' + song.id + '">' + (pvSongId === song.id ? '⏸ 正在播放' : '▶ 试听') + '</button></div></div><div class="library-charts" role="group" aria-label="选择谱面"></div>';
+    detail.querySelector('#btnLibraryBack').onclick = () => {
+      const previous = detailGroupId; sfxClick(); stopPreview(); detailGroupId = null; renderPlay();
+      document.getElementById('scr-play').scrollTop = libraryScrollTop;
+      [...grid.querySelectorAll('button')].find(card => card.dataset.groupId === previous)?.focus({preventScroll:true});
+    };
+    detail.querySelector('[data-pv]').onclick = () => previewSong(song);
+    const list = detail.querySelector('.library-charts');
+    for (const chart of charts) {
+      const row = document.createElement('div'); row.className = 'library-chart-row' + (sel.song === chart.id ? ' sel' : '');
+      const button = document.createElement('button');
+      button.className = 'library-chart' + (sel.song === chart.id ? ' sel' : '');
+      button.setAttribute('aria-pressed', String(sel.song === chart.id));
+      const details = [(chart.bpmLabel || Math.round(chart.bpm * 100) / 100) + ' BPM', chart.noteCount != null ? chart.noteCount + ' notes · ' + chart.holdCount + ' 长条' : chart.desc, chart.creator ? '谱师：' + chart.creator : ''].filter(Boolean).join(' · ');
+      button.innerHTML = '<span class="library-difficulty">' + escHtml(chart.version || '4Key') + '</span><span class="library-chart-meta">' + escHtml(details) + '</span>' + (sel.song === chart.id ? '<span class="library-selected">✓ 已选</span>' : '');
+      button.onclick = () => { sfxClick(); stopPreview(); sel.song = chart.id; renderPlay(); detail.querySelector('.library-chart.sel')?.focus({preventScroll:true}); };
+      row.appendChild(button);
+      const start = document.createElement('button');
+      start.type = 'button'; start.className = 'btn-main chart-start'; start.textContent = '🚀 开始表演';
+      start.setAttribute('aria-label', '开始表演：' + chart.version);
+      start.onclick = () => { sfxClick(); ensureCtx(); stopPreview(); sel.song = chart.id; renderPlay(); startShow(); };
+      row.appendChild(start);
+      if (!chart.chartFile) {
+        const del = document.createElement('button'); del.className = 'cs-del'; del.textContent = '🗑'; del.title = '删除导入谱面'; del.onclick = () => deleteChart(chart); row.appendChild(del);
+      }
+      list.appendChild(row);
+    }
+  } else {
+    const query = songQ.trim().toLowerCase(); let shown = 0, chartCount = 0;
+    for (const [groupId, charts] of groups) {
+      if (!charts.some(song => [song.name, song.artist, song.version, song.creator].join(' ').toLowerCase().includes(query))) continue;
+      shown++; chartCount += charts.length;
+      const selected = charts.find(song => song.id === sel.song), song = selected || charts[0];
+      const card = document.createElement('button'); card.type = 'button'; card.dataset.groupId = groupId;
+      card.className = 'library-song library-song-card' + (selected ? ' sel' : '');
+      card.innerHTML = '<img class="library-cover" loading="lazy" alt="' + escHtml(song.name) + ' 封面" src="' + escHtml(song.cover || 'charts/library/cover-fallback.svg') + '"><div class="library-info"><div class="tname">' + escHtml(song.name) + '</div><div class="library-levels">' + charts.map(chart => '<span class="library-level' + (sel.song === chart.id ? ' sel' : '') + '">' + escHtml(chartLevelLabel(chart)) + '</span>').join('') + '</div></div>';
+      card.onclick = () => { sfxClick(); stopPreview(); libraryScrollTop = document.getElementById('scr-play').scrollTop; detailGroupId = groupId; if (!selected) sel.song = charts[0].id; renderPlay(); document.getElementById('scr-play').scrollTop = 0; detail.querySelector('#btnLibraryBack').focus({preventScroll:true}); };
+      grid.appendChild(card);
+    }
+    document.getElementById('librarySummary').textContent = shown + ' 首歌曲 · ' + chartCount + ' 张 4Key 谱面';
+    if (!shown) grid.innerHTML = '<div class="rank-empty">没有匹配的歌曲或谱面</div>';
+  }
+  const cover = detail.querySelector('img');
+  for (const image of [...grid.querySelectorAll('img'), ...(cover ? [cover] : [])]) image.onerror = () => { image.onerror = null; image.src = 'charts/library/cover-fallback.svg'; };
+  requestAnimationFrame(updateQuickScroll);
 }
 async function deleteChart(song) {
   if (!await askConfirm('删除导入的谱面「' + song.name + '」？')) return;
@@ -1383,13 +1429,14 @@ const builtinCharts = new Map();
 export async function startShow() {
   if (startingShow) return;
   startingShow = true; stopPreview();
+  document.querySelectorAll('.chart-start').forEach(button => { button.disabled = true; });
   try {
     const song = allChartSongs().find(item => item.id === sel.song) || SONGS[0];
     let chart, audio;
     if (song.chartFile) {
       if (!builtinCharts.has(song.id)) {
         const response = await fetch(song.chartFile);
-        if (!response.ok) throw new Error('默认谱面读取失败');
+        if (!response.ok) throw new Error('曲库谱面读取失败');
         builtinCharts.set(song.id, parseMalody(await response.text()));
       }
       chart = builtinCharts.get(song.id); audio = song.file;
@@ -1400,7 +1447,7 @@ export async function startShow() {
     }
     await mainRef.startShow(song, audio, chart);
   } catch (error) { toast(error.message || '谱面加载失败'); }
-  finally { startingShow = false; }
+  finally { startingShow = false; document.querySelectorAll('.chart-start').forEach(button => { button.disabled = false; }); }
 }
 function openCustomModal() {
   const _0x332164 = document.getElementById('customModal');
@@ -1438,7 +1485,8 @@ async function handleCustomUpload(files) {
       const chart = entry.chart;
       const id = 'chart_' + Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
       const meta = { id, name: chart.name, artist: chart.artist, bpm: chart.bpm,
-        version: chart.version, dur: entry.duration, previewStart: chart.previewStart,
+        version: chart.version, creator: chart.creator, noteCount: chart.notes.length,
+        holdCount: chart.notes.filter(note => note.len).length, dur: entry.duration, previewStart: chart.previewStart,
         desc: chart.version + ' · ' + chart.notes.length + ' notes · ' + chart.notes.filter(note => note.len).length + ' 长条' };
       await CustomStore.saveChart(meta, entry.dataUrl, chart);
       Store.data.chartSongs = Store.data.chartSongs || []; Store.data.chartSongs.push(meta);
@@ -1655,7 +1703,55 @@ function bindKeySettings() {
   });
   render();
 }
+let calibration = null;
+function stopCalibration() { if (calibration) calibration.stop(); }
+function bindCalibration() {
+  const start = document.getElementById('calStart');
+  const tap = document.getElementById('calTap');
+  const apply = document.getElementById('calApply');
+  const status = document.getElementById('calStatus');
+  let measured = null, starting = false;
+  start.onclick = async () => {
+    if (calibration) { stopCalibration(); status.textContent = '已取消测量，现有判定偏移未改变。'; return; }
+    if (starting) return;
+    starting = true; start.disabled = true; measured = null; apply.disabled = true;
+    try {
+      const context = ensureCtx(); await context.resume();
+      if (curScr !== 'scr-set' || document.hidden) return;
+      if (context.state !== 'running') throw new Error('音频尚未就绪');
+      setMenuBgmVolume(0); tap.disabled = false; start.textContent = '取消测量';
+      status.textContent = '准备开始 · 跟随声音击打，不要追着闪光按键';
+      calibration = createCalibration({ context, keys: [...Store.data.set.keys],
+        onStatus: text => { status.textContent = text; },
+        pulse: () => { tap.classList.remove('beat'); void tap.offsetWidth; tap.classList.add('beat'); setTimeout(() => tap.classList.remove('beat'), 100); },
+        onStop: () => { calibration = null; tap.disabled = true; start.textContent = '🥁 测量判定偏移'; setMenuBgmVolume(Store.data.set.vol); },
+        onResult: result => {
+          measured = result; apply.disabled = !result;
+          status.textContent = result ? '建议偏移 ' + (result.offset >= 0 ? '+' : '') + result.offset + 'ms · 有效击打 ' + result.count + ' 次 · 波动 ' + result.spread + 'ms。点击应用后保存。' : '有效击打不足或节奏不稳定，请重新测量。';
+        }
+      });
+    } catch (error) { status.textContent = '无法开始测量：' + error.message; setMenuBgmVolume(Store.data.set.vol); }
+    finally { starting = false; start.disabled = false; }
+  };
+  tap.addEventListener('pointerdown', event => { event.preventDefault(); calibration?.hit(); });
+  // Keyboard input is handled once here, including when the tap button has focus.
+  document.addEventListener('keydown', event => {
+    if (!calibration) return;
+    if (event.code === 'Escape') { event.preventDefault(); stopCalibration(); status.textContent = '已取消测量，现有判定偏移未改变。'; return; }
+    if (calibration.accepts(event.code)) { event.preventDefault(); if (!event.repeat && !event.ctrlKey && !event.altKey && !event.metaKey) calibration.hit(); }
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && calibration) { stopCalibration(); status.textContent = '离开页面后测量已停止，请重新开始。'; } });
+  window.addEventListener('blur', () => { if (calibration) { stopCalibration(); status.textContent = '窗口失去焦点，测量已停止，请重新开始。'; } });
+  apply.onclick = () => {
+    if (!measured) return;
+    Store.data.set.offset = measured.offset; Store.save();
+    document.getElementById('setOffset').value = measured.offset;
+    document.getElementById('setOffsetV').textContent = measured.offset + 'ms';
+    status.textContent = '已应用判定偏移 ' + measured.offset + 'ms'; apply.disabled = true;
+  };
+}
 function bindSettings() {
+  bindCalibration();
   bindKeySettings();
   const _0x224649 = Store.data.set,
     _0x3f3ed7 = _0x41e1a3 => document.getElementById(_0x41e1a3),

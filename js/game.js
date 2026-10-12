@@ -75,6 +75,7 @@ export function resumeGame() {
   for (const note of Game.notes) if (note.state === 3 && note.releasedDuringPause) finishHold(note, 0);
 }
 export function stopGame(_0xa418e1) {
+  updateSongProgress(0);
   Game.playing = false, Game.paused = false, Game.activeLanes = null, Game._swapOn = false, Game.loops = 0x1, Game.loopsDone = 0x0, Game.endless = false, cancelAnimationFrame(Game._raf), Music.stop(), Music.el.onended = null, Music.el.loop = false, Music.el.playbackRate = 0x1, document.querySelectorAll(".lane.dim,.receptor.dim").forEach(_0x33cbd6 => _0x33cbd6.classList.remove("dim")), !_0xa418e1 && (document.getElementById("stageUI").classList.remove('on'), document.getElementById("noteTilt").querySelectorAll(".note").forEach(_0x3d1125 => _0x3d1125.remove()));
 }
 export function endGame() {
@@ -88,6 +89,7 @@ function loop() {
     Game._audioStarted = true; Music.play();
   }
   const _0x3c4b42 = gameTime();
+  updateSongProgress(_0x3c4b42);
   const _0x4ab6ad = 0x154 * Game.cfg.speed,
     _0x8afffa = () => document.getElementById('hitLine').offsetTop;
   for (const _0x256dea of Game.notes) {
@@ -115,6 +117,11 @@ function loop() {
     _0x256dea.el.style.transform = "translateY(" + _0x333e2c + "px)";
     if (_0x119014 < -WIN_MISS) judge(_0x256dea, 'miss', _0x256dea.lane);
   }
+}
+function updateSongProgress(time) {
+  const fill = document.getElementById('songProgressFill');
+  const duration = Game.cfg?.duration;
+  if (fill) fill.style.transform = 'scaleX(' + (duration > 0 ? Math.min(1, Math.max(0, time / duration)) : 0) + ')';
 }
 export function gameTime() {
   return Game._audioStarted ? Music.time() : -Math.max(0, Game.paused ? Game._preRollRemaining : Game._startAudioAt - performance.now()) / 1000;
