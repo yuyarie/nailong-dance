@@ -1,8 +1,9 @@
 import * as THREE from 'three';
-import { Music, sfxPerfect, sfxGood, sfxMiss, sfxRandomVoice } from "./audio.js";
+import { Music } from "./audio.js";
 import { doAction, stumble, addMiss } from "./dancer.js";
 import { laneFlash, burst, ringPulse, shake } from "./fx.js";
 const WIN_GOOD = 0.15,
+  NOTE_HALF = 39,
   WIN_PERFECT = 0.07,
   WIN_MISS = 0.19,
   LANE_HEX = [0xff3b6b, 0x36d1ff, 0xffe17a, 0x7a4dff];
@@ -33,7 +34,7 @@ export function startGame(_0x31baf3) {
   const _0x357b50 = _0x31baf3.customNotes.map(note => ({
     t: note.t + (_0x31baf3.offset || 0) / 1000, lane: note.lane, len: note.len || 0, state: 0
   }));
-  Game.activeLanes = null; Game._swapOn = false;
+  Game.activeLanes = null; Game._swapOn = false; Game.hitErrors = [];
   Game._audioStarted = false;
   Game._startAudioAt = performance.now() + Math.max(0, 1.5 - _0x357b50[0].t) * 1000;
   Game.notes = _0x357b50, Game.score = 0x0, Game.combo = 0x0, Game.maxCombo = 0x0, Game.cnt = {
@@ -47,8 +48,9 @@ export function startGame(_0x31baf3) {
     _0x2ba5d9.classList.toggle("dim", !!(Game.activeLanes && !Game.activeLanes.includes(_0x1dcbed)));
   }), Music.el.playbackRate = _0x31baf3.rate || 0x1;
   const _0x349b26 = document.getElementById("hudRate");
-  if (_0x349b26) _0x349b26.textContent = _0x31baf3.rate ? '×' + Number(_0x31baf3.rate).toFixed(0x1) : '';
+  if (_0x349b26) _0x349b26.textContent = _0x31baf3.autoplay ? 'AUTOPLAY · 不计成绩' : _0x31baf3.rate ? '×' + Number(_0x31baf3.rate).toFixed(0x1) : '';
   Music.el.loop = false;
+  Game.chords = _0x31baf3.chordLinks === false ? [] : createChordLinks(Game.notes);
   Music.el.onended = () => finishGame(true);
   console.log('[演出] Malody 4Key · ' + Game.notes.length + ' notes · BPM ' + _0x31baf3.bpm);
   loop();
@@ -75,6 +77,8 @@ export function resumeGame() {
   for (const note of Game.notes) if (note.state === 3 && note.releasedDuringPause) finishHold(note, 0);
 }
 export function stopGame(_0xa418e1) {
+  for (const chord of Game.chords || []) chord.el.remove();
+  Game.chords = [];
   updateSongProgress(0);
   Game.playing = false, Game.paused = false, Game.activeLanes = null, Game._swapOn = false, Game.loops = 0x1, Game.loopsDone = 0x0, Game.endless = false, cancelAnimationFrame(Game._raf), Music.stop(), Music.el.onended = null, Music.el.loop = false, Music.el.playbackRate = 0x1, document.querySelectorAll(".lane.dim,.receptor.dim").forEach(_0x33cbd6 => _0x33cbd6.classList.remove("dim")), !_0xa418e1 && (document.getElementById("stageUI").classList.remove('on'), document.getElementById("noteTilt").querySelectorAll(".note").forEach(_0x3d1125 => _0x3d1125.remove()));
 }
@@ -90,13 +94,14 @@ function loop() {
   }
   const _0x3c4b42 = gameTime();
   updateSongProgress(_0x3c4b42);
+  advanceAutoplay(_0x3c4b42);
   const _0x4ab6ad = 0x154 * Game.cfg.speed,
     _0x8afffa = () => document.getElementById('hitLine').offsetTop;
   for (const _0x256dea of Game.notes) {
     const _0x119014 = _0x256dea.t - _0x3c4b42;
     if (_0x256dea.state === 0x3) {
       if (_0x256dea.el) {
-        _0x256dea.el.style.transform = 'translateY(' + (_0x8afffa() - 0x1a) + "px)";
+        _0x256dea.el.style.transform = 'translateY(' + (_0x8afffa() - NOTE_HALF) + "px)";
         const _0x420f13 = _0x256dea.el.querySelector(".ntail");
         if (_0x420f13) _0x420f13.style.height = Math.max(0x0, (_0x256dea.end - _0x3c4b42) * _0x4ab6ad) + 'px';
       }
@@ -108,14 +113,70 @@ function loop() {
       continue;
     }
     if (_0x119014 > 1.4) break;
-    const _0x333e2c = _0x8afffa() - _0x119014 * _0x4ab6ad - 0x1a;
-    if (_0x333e2c < -52) {
+    const _0x333e2c = _0x8afffa() - _0x119014 * _0x4ab6ad - NOTE_HALF;
+    if (_0x333e2c < -78) {
       _0x256dea.el.style.display = "none";
       continue;
     }
     if (_0x256dea.el.style.display === "none") _0x256dea.el.style.display = '';
     _0x256dea.el.style.transform = "translateY(" + _0x333e2c + "px)";
     if (_0x119014 < -WIN_MISS) judge(_0x256dea, 'miss', _0x256dea.lane);
+  }
+  updateChordLinks(_0x3c4b42, _0x4ab6ad, _0x8afffa());
+}
+function createChordLinks(notes) {
+  const groups = [];
+  let group;
+  for (const note of notes) {
+    if (!group || Math.abs(note.t - group.t) > 1e-7) {
+      group = {t:note.t, notes:[]}; groups.push(group);
+    }
+    group.notes.push(note);
+  }
+  return groups.filter(group => new Set(group.notes.map(note => note.lane)).size > 1).map(group => {
+    group.el = document.createElement('div'); group.el.className = 'chord-link';
+    document.getElementById('noteTilt').appendChild(group.el);
+    return group;
+  });
+}
+function updateChordLinks(time, speed, hitLine) {
+  for (const chord of Game.chords || []) {
+    const pending = chord.notes.filter(note => note.state === 0);
+    const lanes = [...new Set(pending.map(note => note.lane))].sort((a, b) => a - b);
+    const delta = chord.t - time, y = hitLine - delta * speed;
+    if (lanes.length < 2 || delta > 1.4 || delta < -WIN_MISS || y < -39) {
+      chord.el.style.display = 'none'; continue;
+    }
+    const first = Math.min(...lanes), last = Math.max(...lanes);
+    chord.el.style.left = (13 + first * 25) + '%';
+    chord.el.style.width = ((last - first) * 25) + '%';
+    // Connect the edges of each participating head, never draw through an arrow.
+    const signature = lanes.join(',');
+    if (chord.signature !== signature) {
+      chord.signature = signature;
+      chord.el.innerHTML = lanes.slice(0, -1).map((lane, index) => {
+        const left = (lane - first) / (last - first) * 100;
+        const width = (lanes[index + 1] - lane) / (last - first) * 100;
+        return '<i class="chord-link-segment" style="left:calc(' + left + '% + 39px);width:max(0px,calc(' + width + '% - 78px))"></i>';
+      }).join('');
+    }
+    chord.el.style.transform = 'translateY(' + (y - 1.5) + 'px)';
+    chord.el.style.display = 'block';
+  }
+}
+function advanceAutoplay(time) {
+  if (!Game.cfg?.autoplay) return;
+  for (const note of Game.notes) {
+    if (note.t > time) break;
+    if (note.state === 0) {
+      if (note.len) {
+        note.state = 3; note.holdQ = 'perfect';
+        note.el?.classList.add('holding'); receptorPop(note.lane, true);
+        laneFlash(note.lane, '#' + LANE_HEX[note.lane].toString(16));
+        doAction(note.lane, 'perfect');
+      } else judge(note, 'perfect', note.lane, 1, 'perfect', 0);
+    }
+    if (note.state === 3 && time >= note.end) finishHold(note, 1);
   }
 }
 function updateSongProgress(time) {
@@ -127,7 +188,7 @@ export function gameTime() {
   return Game._audioStarted ? Music.time() : -Math.max(0, Game.paused ? Game._preRollRemaining : Game._startAudioAt - performance.now()) / 1000;
 }
 export function hitLane(_0x50da15, _0x22fb9c) {
-  if (!Game.playing || Game.paused) return;
+  if (!Game.playing || Game.paused || Game.cfg?.autoplay) return;
   if (Game.activeLanes && !Game.activeLanes.includes(_0x50da15)) return;
   const _0x4741c5 = gameTime();
   let _0x51b289 = null,
@@ -143,11 +204,12 @@ export function hitLane(_0x50da15, _0x22fb9c) {
     return;
   }
   if (_0x51b289.len) {
+    if (!Game.cfg.autoplay) Game.hitErrors.push((_0x4741c5 - _0x51b289.t) * 1000);
     _0x51b289.state = 0x3, _0x51b289.holdQ = _0x59fafa <= WIN_PERFECT ? "perfect" : "good";
     if (_0x51b289.el) _0x51b289.el.classList.add("holding");
     receptorPop(_0x50da15, true);
     const _0x30d123 = '#' + LANE_HEX[_0x50da15].toString(0x10).padStart(0x6, '0');
-    laneFlash(_0x50da15, _0x30d123), doAction(_0x50da15, _0x51b289.holdQ), _0x51b289.holdQ === "perfect" ? sfxPerfect() : sfxGood(), floatText(_0x50da15, _0x51b289.holdQ === "perfect" ? "PERFECT!" : "GOOD", _0x51b289.holdQ === 'perfect' ? "#4fe3ff" : "#ffe17a", timingSub(_0x51b289.t - _0x4741c5)), Game.hooks.onJudge && Game.hooks.onJudge({
+    laneFlash(_0x50da15, _0x30d123), doAction(_0x50da15, _0x51b289.holdQ), floatText(_0x50da15, _0x51b289.holdQ === "perfect" ? "PERFECT!" : "GOOD", _0x51b289.holdQ === 'perfect' ? "#4fe3ff" : "#ffe17a", timingSub(_0x51b289.t - _0x4741c5)), Game.hooks.onJudge && Game.hooks.onJudge({
       'lane': _0x50da15,
       'q': _0x51b289.holdQ
     });
@@ -156,7 +218,7 @@ export function hitLane(_0x50da15, _0x22fb9c) {
   judge(_0x51b289, _0x59fafa <= WIN_PERFECT ? "perfect" : "good", _0x50da15, 0x1, _0x59fafa <= WIN_PERFECT ? 'perfect' : "good", _0x51b289.t - _0x4741c5);
 }
 export function releaseLane(_0x5193af) {
-  if (!Game.playing) return;
+  if (!Game.playing || Game.cfg?.autoplay) return;
   if (Game.paused) {
     for (const note of Game.notes) if (note.state === 3 && note.lane === _0x5193af) note.releasedDuringPause = true;
     return;
@@ -174,12 +236,13 @@ function finishHold(note, fraction) {
   judge(note, fraction >= 1 ? note.holdQ : 'miss', note.lane);
 }
 function judge(_0x9ffea9, _0x47b2be, _0xae5322, _0x404031 = 0x1, _0x36a4a0 = _0x47b2be, _0x33f912 = null) {
+  if (!Game.cfg.autoplay && _0x47b2be !== 'miss' && Number.isFinite(_0x33f912)) Game.hitErrors.push(-_0x33f912 * 1000);
   _0x9ffea9.state = _0x47b2be === 'miss' ? 0x2 : 0x1;
   const _0x1a7889 = _0x9ffea9.el;
   if (_0x47b2be === "miss") {
     Game.cnt.miss++, Game.combo = 0x0;
     _0x1a7889 && (_0x1a7889.classList.add("missed"), setTimeout(() => _0x1a7889.remove(), 0x1a4), _0x9ffea9.el = null);
-    sfxMiss(), stumble(), addMiss(), sfxRandomVoice(), shake(0.16);
+    stumble(), addMiss(), shake(0.16);
     const _0x1a7a8e = document.getElementById("missVig");
     _0x1a7a8e.classList.add('on'), setTimeout(() => _0x1a7a8e.classList.remove('on'), 0x82), floatText(_0xae5322, "MISS", '#ff5b7f');
   } else {
@@ -188,7 +251,7 @@ function judge(_0x9ffea9, _0x47b2be, _0xae5322, _0x404031 = 0x1, _0x36a4a0 = _0x
       const _0xadaf7b = LANE_HEX[_0x9ffea9.lane];
       _0x1a7889.style.setProperty("--eatT", _0x1a7889.style.transform || 'translateY(0px)'), _0x1a7889.classList.add("gone"), setTimeout(() => _0x1a7889.remove(), 0xc8), _0x9ffea9.el = null, receptorPop(_0x9ffea9.lane, true), laneFlash(_0x9ffea9.lane, _0xadaf7b), ringPulse((_0x9ffea9.lane - 1.5) * 0.95, 1.7, _0xadaf7b);
       const _0x340bf2 = new THREE.Vector3((_0x9ffea9.lane - 1.5) * 0.6, 1.1, 0.4);
-      burst(_0x340bf2, _0xadaf7b, _0x47b2be === "perfect" ? 0x34 : 0x1a), _0x47b2be === 'perfect' ? sfxPerfect() : sfxGood(), floatText(_0x9ffea9.lane, _0x404031 < 0x1 ? Math.round(_0x404031 * 0x64) + '%' : _0x47b2be === "perfect" ? "PERFECT!" : "GOOD", _0x47b2be === 'perfect' ? "#4fe3ff" : "#ffe17a", timingSub(_0x33f912));
+      burst(_0x340bf2, _0xadaf7b, _0x47b2be === "perfect" ? 0x34 : 0x1a), floatText(_0x9ffea9.lane, _0x404031 < 0x1 ? Math.round(_0x404031 * 0x64) + '%' : _0x47b2be === "perfect" ? "PERFECT!" : "GOOD", _0x47b2be === 'perfect' ? "#4fe3ff" : "#ffe17a", timingSub(_0x33f912));
     }
     doAction(_0x9ffea9.lane, _0x47b2be);
     if ([0x32, 0x64, 0x96, 0xc8, 0x12c, 0x190, 0x1f4].includes(Game.combo)) {
@@ -197,7 +260,7 @@ function judge(_0x9ffea9, _0x47b2be, _0xae5322, _0x404031 = 0x1, _0x36a4a0 = _0x
     }
   }
   if (Game.replay) Game.replay.push({
-    't': +Music.time().toFixed(0x3),
+    't': +gameTime().toFixed(0x3),
     'lane': _0x9ffea9.lane,
     'q': _0x47b2be
   });
@@ -266,6 +329,7 @@ function updateHud() {
 function finishGame(_0x130771) {
   if (!Game.playing) return;
   const endedAt = gameTime();
+  advanceAutoplay(endedAt);
   for (const note of Game.notes) {
     if (note.state === 0) judge(note, 'miss', note.lane);
     else if (note.state === 3) finishHold(note, endedAt >= note.end - WIN_GOOD ? 1 : 0);
@@ -291,13 +355,16 @@ function finishGame(_0x130771) {
     },
     'acc': _0x57e258,
     'rank': _0x44afef,
-    'coin': _0x4f09bb,
+    'coin': Game.cfg.autoplay ? 0 : _0x4f09bb,
+    'autoplay': !!Game.cfg.autoplay,
     'diff': Game.cfg.diff,
     'songId': Game.cfg.songId || "default",
     'sec': _0x3e8119,
     'loops': Game.loopsDone || 0x0,
     'maxRate': Game.maxRate || 0x1,
-    'replay': Game.replay || []
+    'replay': Game.replay || [],
+    'hitErrors': [...(Game.hitErrors || [])], 'baseOffset': Game.cfg.offset || 0,
+    'duration': Game.cfg.duration || endedAt
   });
 }
 export function chartDuration() {

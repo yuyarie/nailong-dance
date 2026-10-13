@@ -1,5 +1,6 @@
+import { recommendOffset } from './result-analysis.js';
 import { LIBRARY_CHARTS } from './library.js';
-import { Music, setSfxEnabled, sfxClick, sfxCoin, sfxMiss, ensureCtx, setMenuBgmVolume, setVoiceVolume, Preview } from "./audio.js";
+import { Music, sfxClick, sfxCoin, sfxMiss, ensureCtx, setMenuBgmVolume, setVoiceVolume, Preview } from "./audio.js";
 import { Game, pauseGame } from "./game.js";
 import { parseMalody, importMalodyFiles } from "./malody.js";
 import { CustomStore } from "./customstore.js";
@@ -48,7 +49,7 @@ const KEY = 'naiwa_dance_local_save_v1',
     },
     'set': {
       'vol': 0.8,
-      'sfx': 0x1,
+      'chordLinks': 1,
       'offset': 0x0,
       'speed': 0x1,
       'keys': [...DEFAULT_KEYS],
@@ -83,7 +84,7 @@ export const Store = {
     }, this.data.scores = {
       ...DEFAULTS.scores,
       ...(this.data.scores || {})
-    }, this.data.set.keys = normalizeKeys(this.data.set.keys), this.data.usedCodes = this.data.usedCodes || [], void 0, this.data;
+    }, delete this.data.set.sfx, this.data.set.chordLinks = this.data.set.chordLinks === 0 ? 0 : 1, this.data.set.keys = normalizeKeys(this.data.set.keys), this.data.usedCodes = this.data.usedCodes || [], void 0, this.data;
   },
   'save'() {
     this.data.saveAt = Date.now(), localStorage.setItem(KEY, JSON.stringify(this.data));
@@ -1317,7 +1318,7 @@ export function renderHome() {
   }
 }
 function allChartSongs() { return [...SONGS, ...(Store.data.chartSongs || [])]; }
-let detailGroupId = null, libraryScrollTop = 0;
+let detailGroupId = null, libraryScrollTop = 0, autoplay = false;
 function chartGroupId(chart) { return chart.groupId || 'import:' + chart.name + ':' + chart.artist; }
 function chartLevelLabel(chart) {
   const level = chart.level ?? chart.version?.match(/(?:Lv\.?|Level\s*)(\d+(?:\.\d+)?)/i)?.[1];
@@ -1340,6 +1341,10 @@ function renderPlay() {
   if (detailGroupId) {
     const charts = groups.get(detailGroupId), song = charts.find(item => item.id === sel.song) || charts[0];
     detail.innerHTML = '<button class="btn-back" id="btnLibraryBack">← 返回曲库</button><div class="song-detail-head"><img class="library-cover" alt="' + escHtml(song.name) + ' 封面" src="' + escHtml(song.cover || 'charts/library/cover-fallback.svg') + '"><div><h2>' + escHtml(song.name) + '</h2><div class="library-artist">' + escHtml(song.artist) + '</div><div class="library-count">4KEY · ' + charts.length + ' 张谱面</div><button class="pv-btn' + (pvSongId === song.id ? ' on' : '') + '" data-pv="' + song.id + '">' + (pvSongId === song.id ? '⏸ 正在播放' : '▶ 试听') + '</button></div></div><div class="library-charts" role="group" aria-label="选择谱面"></div>';
+    const auto = document.createElement('label'); auto.className = 'autoplay-control';
+    auto.innerHTML = '<span><b>Autoplay</b><small>自动演示 · 不计成绩</small></span><input type="checkbox" aria-label="Autoplay 自动演示"' + (autoplay ? ' checked' : '') + '>';
+    auto.querySelector('input').onchange = event => { autoplay = event.target.checked; sfxClick(); };
+    detail.querySelector('.song-detail-head').appendChild(auto);
     detail.querySelector('#btnLibraryBack').onclick = () => {
       const previous = detailGroupId; sfxClick(); stopPreview(); detailGroupId = null; renderPlay();
       document.getElementById('scr-play').scrollTop = libraryScrollTop;
@@ -1445,7 +1450,7 @@ export async function startShow() {
       if (!stored?.chart) throw new Error('谱面文件缺失，请重新导入');
       chart = stored.chart; audio = stored.dataUrl;
     }
-    await mainRef.startShow(song, audio, chart);
+    await mainRef.startShow(song, audio, chart, autoplay);
   } catch (error) { toast(error.message || '谱面加载失败'); }
   finally { startingShow = false; document.querySelectorAll('.chart-start').forEach(button => { button.disabled = false; }); }
 }
@@ -1757,12 +1762,12 @@ function bindSettings() {
     _0x3f3ed7 = _0x41e1a3 => document.getElementById(_0x41e1a3),
     _0x2ea597 = _0x3f3ed7('setVol'),
     _0x5e54ac = _0x3f3ed7('setOffset');
-  _0x2ea597.value = _0x224649.vol * 0x64, _0x3f3ed7("setVolV").textContent = Math.round(_0x224649.vol * 0x64) + '%', _0x5e54ac.value = _0x224649.offset, _0x3f3ed7("setOffsetV").textContent = _0x224649.offset + 'ms', _0x3f3ed7("setSfx").value = String(_0x224649.sfx), _0x3f3ed7('setSpeed').value = String(_0x224649.speed || 0x1), _0x3f3ed7('setSpeedV').textContent = (_0x224649.speed || 0x1).toFixed(0x1) + '×', _0x3f3ed7("setQuality").value = String(_0x224649.quality), _0x3f3ed7("setPad").value = String(_0x224649.pad == null ? 0x1 : _0x224649.pad), _0x3f3ed7('setGap').value = String(_0x224649.gap == null ? 0x1 : _0x224649.gap), _0x3f3ed7("setSwipe").value = String(_0x224649.swipe == null ? 0x1 : _0x224649.swipe), _0x3f3ed7("setClimb").value = String(_0x224649.climb == null ? 0x1 : _0x224649.climb), _0x2ea597.oninput = () => {
+  _0x2ea597.value = _0x224649.vol * 0x64, _0x3f3ed7("setVolV").textContent = Math.round(_0x224649.vol * 0x64) + '%', _0x5e54ac.value = _0x224649.offset, _0x3f3ed7("setOffsetV").textContent = _0x224649.offset + 'ms', _0x3f3ed7("setChordLinks").value = String(_0x224649.chordLinks), _0x3f3ed7('setSpeed').value = String(_0x224649.speed || 0x1), _0x3f3ed7('setSpeedV').textContent = (_0x224649.speed || 0x1).toFixed(0x1) + '×', _0x3f3ed7("setQuality").value = String(_0x224649.quality), _0x3f3ed7("setPad").value = String(_0x224649.pad == null ? 0x1 : _0x224649.pad), _0x3f3ed7('setGap').value = String(_0x224649.gap == null ? 0x1 : _0x224649.gap), _0x3f3ed7("setSwipe").value = String(_0x224649.swipe == null ? 0x1 : _0x224649.swipe), _0x3f3ed7("setClimb").value = String(_0x224649.climb == null ? 0x1 : _0x224649.climb), _0x2ea597.oninput = () => {
     _0x224649.vol = _0x2ea597.value / 0x64, _0x3f3ed7('setVolV').textContent = _0x2ea597.value + '%', applyVolume(), Store.save();
   }, _0x5e54ac.oninput = () => {
     _0x224649.offset = +_0x5e54ac.value, _0x3f3ed7("setOffsetV").textContent = _0x5e54ac.value + 'ms', Store.save();
-  }, _0x3f3ed7("setSfx").onchange = _0x209ded => {
-    _0x224649.sfx = +_0x209ded.target.value, setSfxEnabled(!!_0x224649.sfx), Store.save();
+  }, _0x3f3ed7('setChordLinks').onchange = event => {
+    _0x224649.chordLinks = Number(event.target.value); Store.save();
   }, _0x3f3ed7('setSpeed').oninput = _0x2ec6c0 => {
     _0x224649.speed = +_0x2ec6c0.target.value, _0x3f3ed7("setSpeedV").textContent = _0x224649.speed.toFixed(0x1) + '×', Store.save();
   }, _0x3f3ed7("setQuality").onchange = _0xad444e => {
@@ -1807,6 +1812,7 @@ export function touchLoginStreak() {
   _0xb6ff7c.loginStreak = _0xb6ff7c.lastPlayDate === _0x30d089 ? (_0xb6ff7c.loginStreak || 0x0) + 0x1 : 0x1, _0xb6ff7c.lastPlayDate = _0x4dd558;
 }
 export function showResult(_0x406697, _0x2225dc) {
+  if (!_0x406697.autoplay) {
   const _0x5d5cb4 = Store.data.stats;
   _0x5d5cb4.plays++, _0x5d5cb4.totalPerfect += _0x406697.cnt.perfect, _0x5d5cb4.totalCoins += _0x406697.coin, _0x5d5cb4.totalMiss = (_0x5d5cb4.totalMiss || 0x0) + _0x406697.cnt.miss, _0x5d5cb4.totalGood = (_0x5d5cb4.totalGood || 0x0) + _0x406697.cnt.good, _0x5d5cb4.worstMiss = Math.max(_0x5d5cb4.worstMiss || 0x0, _0x406697.cnt.miss);
   if (_0x406697.score > _0x5d5cb4.bestScore) _0x5d5cb4.bestScore = _0x406697.score;
@@ -1822,24 +1828,40 @@ export function showResult(_0x406697, _0x2225dc) {
     'combo': _0x406697.maxCombo,
     'rank': _0x406697.rank,
     'date': new Date().toLocaleDateString()
-  }), Store.data.chartScores[_0x406697.songId].sort((_0x35425b, _0x174063) => _0x174063.score - _0x35425b.score), Store.data.chartScores[_0x406697.songId] = Store.data.chartScores[_0x406697.songId].slice(0x0, 0xa), Store.save(), document.getElementById('resRank').textContent = _0x406697.rank, document.getElementById('resScore').textContent = _0x406697.score.toLocaleString(), document.getElementById("resPerfect").textContent = _0x406697.cnt.perfect, document.getElementById("resGood").textContent = _0x406697.cnt.good, document.getElementById('resMiss').textContent = _0x406697.cnt.miss, document.getElementById("resCombo").textContent = _0x406697.maxCombo, document.getElementById("resCoin").textContent = _0x406697.coin, document.getElementById("resNew").style.display = _0x2225dc ? '' : "none", showResultQuote(_0x406697), drawReplayStrip(_0x406697.replay || [], _0x406697.sec || 0x0), renderSeasonBadge(), showScreen("scr-result"), renderHome(), renderAch();
+  }), Store.data.chartScores[_0x406697.songId].sort((_0x35425b, _0x174063) => _0x174063.score - _0x35425b.score), Store.data.chartScores[_0x406697.songId] = Store.data.chartScores[_0x406697.songId].slice(0x0, 0xa), Store.save();
+  }
+  renderResultOffset(_0x406697);
+  document.getElementById('resAutoplay').hidden = !_0x406697.autoplay;
+  document.getElementById('resRank').textContent = _0x406697.rank, document.getElementById('resScore').textContent = _0x406697.score.toLocaleString(), document.getElementById("resPerfect").textContent = _0x406697.cnt.perfect, document.getElementById("resGood").textContent = _0x406697.cnt.good, document.getElementById('resMiss').textContent = _0x406697.cnt.miss, document.getElementById("resCombo").textContent = _0x406697.maxCombo, document.getElementById("resCoin").textContent = _0x406697.coin, document.getElementById("resNew").style.display = _0x2225dc && !_0x406697.autoplay ? '' : "none", showResultQuote(_0x406697), drawReplayStrip(_0x406697.replay || [], _0x406697.duration || _0x406697.sec || 0x0), renderSeasonBadge(), showScreen("scr-result"), renderHome(), renderAch();
 }
-function drawReplayStrip(_0x5aa868, _0x4e95fe) {
-  const _0x553fdb = document.getElementById("replayStrip");
-  if (!_0x553fdb) return;
-  if (!_0x5aa868.length) {
-    _0x553fdb.innerHTML = '';
-    return;
-  }
-  const _0x31efd9 = Math.max(_0x4e95fe, _0x5aa868[_0x5aa868.length - 0x1].t, 0x1);
-  let _0x13c4bc = '';
-  for (const _0x3b9ffb of _0x5aa868) {
-    const _0x278f2c = (_0x3b9ffb.t / _0x31efd9 * 0x64).toFixed(0x2),
-      _0x4a3c10 = _0x3b9ffb.q === "miss" ? "#ff5b7f" : _0x3b9ffb.q === "perfect" ? "#4fe3ff" : '#ffe17a',
-      _0x16bc52 = 0xa + _0x3b9ffb.lane * 0x4;
-    _0x13c4bc += '<i\x20style=\x22left:' + _0x278f2c + "%;bottom:" + _0x16bc52 + "px;background:" + _0x4a3c10 + "\"></i>";
-  }
-  _0x553fdb.innerHTML = _0x13c4bc + '<span\x20class=\x22rp-tip\x22>判定时间轴（蓝P\x20黄G\x20红M）</span>';
+function renderResultOffset(result) {
+  const box = document.getElementById('resultOffsetHint');
+  box.hidden = !!result.autoplay; box.innerHTML = '';
+  if (result.autoplay) return;
+  const measured = recommendOffset(result.hitErrors || [], result.baseOffset);
+  if (!measured) { box.textContent = '本局有效击打不足 10 次，暂无法推荐判定偏移。'; return; }
+  const signed = value => (value > 0 ? '+' : '') + value;
+  box.innerHTML = '<b>推荐判定偏移：' + signed(measured.offset) + 'ms</b><p>' + measured.count + ' 次有效击打，平均' + (measured.mean >= 0 ? '晚' : '早') + ' ' + Math.abs(measured.mean).toFixed(1) + 'ms；本局偏移 ' + signed(result.baseOffset) + 'ms。推荐值 = 本局偏移 + 平均误差，仅供参考。</p><button class="btn-ghost">使用推荐偏移</button>';
+  const button = box.querySelector('button');
+  button.onclick = () => {
+    Store.data.set.offset = measured.offset; Store.save();
+    document.getElementById('setOffset').value = measured.offset;
+    document.getElementById('setOffsetV').textContent = measured.offset + 'ms';
+    button.disabled = true; button.textContent = '已应用 ' + signed(measured.offset) + 'ms';
+    toast('判定偏移已更新');
+  };
+}
+function drawReplayStrip(replay, duration) {
+  const strip = document.getElementById('replayStrip');
+  if (!strip) return;
+  const points = replay.filter(point => Number.isFinite(point.t) && point.lane >= 0 && point.lane < 4);
+  const first = points.reduce((start, point) => Math.min(start, point.t), 0);
+  const last = points.reduce((end, point) => Math.max(end, point.t), Math.max(duration, first + 1));
+  strip.innerHTML = points.map(point => {
+    const percent = Math.max(0, Math.min(100, (point.t - first) / (last - first) * 100));
+    const color = point.q === 'miss' ? '#ff5b7f' : point.q === 'perfect' ? '#4fe3ff' : '#ffe17a';
+    return '<i style="left:clamp(2px,' + percent.toFixed(3) + '%,calc(100% - 4px));top:' + (4 + point.lane * 14) + 'px;background:' + color + '"></i>';
+  }).join('');
 }
 const SEASON_TIERS = [{
     'min': 0x0,

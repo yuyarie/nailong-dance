@@ -154,8 +154,9 @@
       <span class="sv" id="setVolV">80%</span>
     </div>
     <div class="set-item">
-      <span class="sl">🔊 音效</span>
-      <select id="setSfx"><option value="1">开启</option><option value="0">关闭</option></select>
+      <span class="sl">↔️ 多押提示连接线</span>
+      <select id="setChordLinks"><option value="1">开启</option><option value="0">关闭</option></select>
+      <span class="mini-tip">为同一时刻的多押音符显示横向白色连接线，下次演出生效。</span>
       <span class="mini-tip">判定 / 开场 / 按钮音效开关</span>
     </div>
     <div class="set-item key-binding-settings">
@@ -269,6 +270,7 @@
     <div class="result-box card">
       <div class="result-rank" id="resRank">S</div>
       <div class="result-score" id="resScore">0</div>
+      <div id="resAutoplay" class="autoplay-result" hidden>🤖 Autoplay 自动演示 · 本场不计成绩</div>
       <div class="result-new" id="resNew" style="display:none">🎉 新纪录！</div>
       <div id="resQuote" style="font-size:20px;font-weight:900;color:var(--yellow);margin:8px 0;text-shadow:0 2px 8px #000"></div>
       <div class="result-grid">
@@ -281,6 +283,8 @@
       <div class="season-badge" id="seasonBadge"></div>
       <div id="seasonInfo" style="font-size:11px;color:var(--sub);margin:-2px 0 4px"></div>
       <div class="replay-strip" id="replayStrip"></div>
+      <div class="replay-legend">判定时间轴 · <span>蓝 Perfect</span> · <span>黄 Good</span> · <span>红 Miss</span> · 从上到下 key1–key4</div>
+      <div id="resultOffsetHint" class="result-offset-hint" hidden></div>
       <div class="result-btns">
         <button class="btn-main" id="btnRetry">🔁 再来一次</button>
         <button class="btn-ghost" id="btnBackHome">回主界面</button>

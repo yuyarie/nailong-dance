@@ -1074,14 +1074,14 @@
     {
       "path": "index.html",
       "source": "https://nailong-dance.pages.dev/",
-      "sha256": "6ceabd27855605451833212859c516e64c09bfec1d73e3d302aab1ce7873c809",
-      "bytes": 18936
+      "sha256": "82d2d36320dbddddbd1aa967adb866ba5e63ff61a9d393ed2bb389a4fffde77b",
+      "bytes": 19427
     },
     {
       "path": "js/audio.js",
       "source": "https://nailong-dance.pages.dev/js/audio.js",
-      "sha256": "be2d031c025719a4ffa104bc80f3d03f9542edb269954ab5d180121eda99867b",
-      "bytes": 20478
+      "sha256": "95aee91be2bbb90bd0ff06b0ec4d9e9233b2c96c9981f32a85770a3228a7c66a",
+      "bytes": 20127
     },
     {
       "path": "js/calibration.js",
@@ -1110,8 +1110,8 @@
     {
       "path": "js/game.js",
       "source": "https://nailong-dance.pages.dev/js/game.js",
-      "sha256": "17a5658e73579cb6160fd662efc6183c926b26da37b4296e4d6a265888480244",
-      "bytes": 16493
+      "sha256": "d8a57e6784559796cf5477e789260f1ec6695c7e3e01cd7b7ea10bd9ef0a26ff",
+      "bytes": 19474
     },
     {
       "path": "js/keybindings.js",
@@ -1128,8 +1128,8 @@
     {
       "path": "js/main.js",
       "source": "https://nailong-dance.pages.dev/js/main.js",
-      "sha256": "d0a7a25a43a2e394cb7275ba9c1a39d964a60e68ddce218bd700a9e0f26f7514",
-      "bytes": 26491
+      "sha256": "559468b6537d6748f4a0ad7c3fabf52bbf163a69c4af769a5d7bf7a4d98e0aee",
+      "bytes": 26584
     },
     {
       "path": "js/malody.js",
@@ -1144,10 +1144,16 @@
       "bytes": 8502
     },
     {
+      "path": "js/result-analysis.js",
+      "source": null,
+      "sha256": "027e4c1c579b6a05c6d8156d7dbcee6dd41222bd337e6b63b07e66bc3c586c55",
+      "bytes": 472
+    },
+    {
       "path": "js/ui.js",
       "source": "https://nailong-dance.pages.dev/js/ui.js",
-      "sha256": "9fa32b284cd78ea908ec54e97895f4c1c30db6d67ca92d2c5fe6e62dad604571",
-      "bytes": 76006
+      "sha256": "ed7fd9d87f09c17c5d0a4a46ee979fde2593f987230366bd858c3172f1724138",
+      "bytes": 78022
     },
     {
       "path": "package.json",
@@ -1158,8 +1164,8 @@
     {
       "path": "README.md",
       "source": null,
-      "sha256": "ab7c95e8ab3b1c4c78c78b778eadfd30efc9911069a5be5adff8b3003d91a72a",
-      "bytes": 7436
+      "sha256": "7a9fdb8cf530477d780f01cf8ee9a3da3475d350bd7927e26223f01a5273d437",
+      "bytes": 8723
     },
     {
       "path": "rigged.glb",
@@ -1206,8 +1212,8 @@
     {
       "path": "style.css",
       "source": "https://nailong-dance.pages.dev/style.css",
-      "sha256": "51abff67d08757fde7f67239ec17ce8bfb58bdf24479dc0c245e1ce82347183b",
-      "bytes": 56692
+      "sha256": "3891cb5849f41bcf688fc84abb02ec4a30dd2d0f1646490559835903f0bd961b",
+      "bytes": 58010
     },
     {
       "path": "tests/calibration.test.mjs",
@@ -1224,8 +1230,14 @@
     {
       "path": "tests/malody.test.mjs",
       "source": null,
-      "sha256": "b381add272f8a3436819e6eebe2244217bf92c5c6bc81c0fb929b90465e88fbe",
-      "bytes": 5412
+      "sha256": "cb36663e2d047c755ff90b901443b124ee35c3ae735d40681de57d86bb803009",
+      "bytes": 9927
+    },
+    {
+      "path": "tests/result-analysis.test.mjs",
+      "source": null,
+      "sha256": "d672fdfefaf5ab135d0725f0682aeef1d72ce98cce31d18b723f62cb6fed055b",
+      "bytes": 743
     },
     {
       "path": "vendor/three/addons/loaders/GLTFLoader.js",

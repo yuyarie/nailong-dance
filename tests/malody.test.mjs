@@ -37,7 +37,7 @@ test('reject invalid modes, columns, BPM, malformed fractions, missing audio, ba
   for(const mutate of [c=>c.meta.mode=1,c=>c.meta.mode_ext.column=7,c=>c.note[0].column=4,c=>c.time[0].bpm=0,c=>c.note[0].beat=[1,0,0],c=>c.note.pop(),c=>c.note[0].endbeat=[0,0,1]]){const raw=basic();mutate(raw);assert.throws(()=>parseMalody(raw));}
   assert.throws(()=>parseMalody(chart([{beat:[1,0,1],endbeat:[3,0,1],column:0},{beat:[2,0,1],column:0}])));
 });
-function harness(notes) {
+function harness(notes, options = {}) {
   let now=0,time=0,plays=0;
   const node=()=>({style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){}},offsetTop:350,appendChild(){},remove(){},querySelector(){return null},querySelectorAll(){return []}});
   const noop=()=>{};
@@ -47,7 +47,7 @@ function harness(notes) {
     sfxPerfect:noop,sfxGood:noop,sfxMiss:noop,sfxRandomVoice:noop,doAction:noop,stumble:noop,addMiss:noop,laneFlash:noop,burst:noop,ringPulse:noop,shake:noop});
   const src=fs.readFileSync(new URL('../js/game.js',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,'').replace(/export /g,'');
   vm.runInContext(src+'\nthis.api={Game,startGame,hitLane,releaseLane,pauseGame,resumeGame,gameTime,loop,finishGame};',context);
-  const api=context.api; api.startGame({customNotes:notes,offset:0,speed:1,bpm:120,duration:10,songId:'test'});
+  const api=context.api; api.startGame({customNotes:notes,offset:0,speed:1,bpm:120,duration:10,songId:'test',...options});
   return {...api,advance:(n,t)=>{now=n;time=t;api.loop()},clock:(n,t)=>{now=n;time=t},plays:()=>plays};
 }
 test('hold length reaches gameplay; tail completes once and early release misses once', () => {
@@ -63,4 +63,53 @@ test('negative-time notes have preroll, and preroll pause/resume does not advanc
 test('finish accounts for all unjudged notes and captures duration before stopping audio', () => {
   const h=harness([{t:2,lane:0,len:0},{t:3,lane:1,len:1}]);let result;h.Game.hooks.onEnd=r=>result=r;
   h.advance(1,0);h.clock(20,10);h.finishGame();assert.equal(result.cnt.miss,2);assert.equal(result.sec,10);assert.equal(result.songId,'test');
+});
+
+test('autoplay handles chords, holds and skipped frames; ignores manual input and pause; awards no coins', () => {
+  const h = harness([{t:2,lane:0,len:1},{t:2,lane:1,len:0},{t:2.1,lane:2,len:0}], {autoplay:true});
+  h.advance(1,1);h.hitLane(0);assert.equal(h.Game.notes[0].state,0);
+  h.pauseGame();h.advance(2,2.5);assert.equal(h.Game.cnt.perfect,0);h.resumeGame();
+  h.advance(3,2.5);assert.equal(h.Game.cnt.perfect,2);assert.equal(h.Game.notes[0].state,3);
+  h.releaseLane(0);assert.equal(h.Game.cnt.miss,0);h.advance(4,3.5);assert.equal(h.Game.cnt.perfect,3);
+  let result;h.Game.hooks.onEnd = r => result = r;h.finishGame();assert.equal(result.autoplay,true);assert.equal(result.coin,0);assert.equal(result.cnt.miss,0);
+});
+test('autoplay results leave stored statistics, records and coins unchanged', () => {
+  const data={stats:{plays:3,bestScore:1000},coins:339,chartScores:{}};
+  const before=JSON.stringify(data);let saves=0;
+  const nodes=new Map();const get=id=>{if(!nodes.has(id))nodes.set(id,{style:{}});return nodes.get(id)};
+  const noop=()=>{};
+  const context=vm.createContext({Store:{data,save:()=>saves++},document:{getElementById:get},renderResultOffset:noop,showResultQuote:noop,drawReplayStrip:noop,renderSeasonBadge:noop,showScreen:noop,renderHome:noop,renderAch:noop});
+  const source=fs.readFileSync(new URL('../js/ui.js',import.meta.url),'utf8');
+  vm.runInContext(source.slice(source.indexOf('export function showResult('),source.indexOf('function renderResultOffset(')).replace('export ', '')+';this.result=showResult;',context);
+  context.result({autoplay:true,rank:'SS',score:50000,maxCombo:100,cnt:{perfect:100,good:0,miss:0},coin:0,songId:'test',acc:1},true);
+  assert.equal(JSON.stringify(data),before);assert.equal(saves,0);assert.equal(get('resNew').style.display,'none');assert.equal(get('resAutoplay').hidden,false);
+});
+
+test('chord guides group only simultaneous lanes, span participating lanes and disappear after judgement', () => {
+  const h=harness([{t:2,lane:0,len:0},{t:2,lane:3,len:1},{t:2.01,lane:1,len:0},{t:4,lane:0,len:0},{t:4,lane:1,len:0},{t:4,lane:2,len:0},{t:6,lane:0,len:0},{t:6,lane:1,len:0},{t:6,lane:2,len:0},{t:6,lane:3,len:0}]);
+  assert.equal(h.Game.chords.length,3);assert.deepEqual(Array.from(h.Game.chords,c=>c.notes.length),[2,3,4]);
+  h.advance(1,1.5);const chord=h.Game.chords[0];assert.equal(chord.el.style.display,'block');assert.equal(chord.el.style.left,'13%');assert.equal(chord.el.style.width,'75%');assert.ok(chord.el.innerHTML.includes('left:calc(0% + 39px)'));assert.ok(chord.el.innerHTML.includes('width:max(0px,calc(100% - 78px))'));
+  h.clock(2,2);h.hitLane(0);h.advance(3,2);assert.equal(chord.el.style.display,'none');
+  h.advance(4,4);assert.equal(h.Game.chords[1].el.style.width,'50%');
+  h.hitLane(0);h.advance(5,4);assert.equal(h.Game.chords[1].el.style.left,'38%');assert.equal(h.Game.chords[1].el.style.width,'25%');
+});
+
+
+test('offset samples record signed tap and hold-head errors exactly once, excluding misses', () => {
+  const h=harness([{t:2,lane:0,len:0},{t:3,lane:1,len:1},{t:6,lane:2,len:0}],{offset:100});
+  h.advance(1,2.15);h.hitLane(0);h.advance(2,3.05);h.hitLane(1);h.advance(3,4.2);h.advance(4,7);
+  assert.equal(h.Game.hitErrors.length,2);close(h.Game.hitErrors[0],50);close(h.Game.hitErrors[1],-50);
+  let result;h.Game.hooks.onEnd=r=>result=r;h.finishGame();assert.equal(result.baseOffset,100);
+});
+test('replay chart spans negative preroll and all events even with unsorted judgments', () => {
+  const strip={innerHTML:''};const context=vm.createContext({document:{getElementById:()=>strip}});
+  const source=fs.readFileSync(new URL('../js/ui.js',import.meta.url),'utf8');
+  vm.runInContext(source.slice(source.indexOf('function drawReplayStrip('),source.indexOf('const SEASON_TIERS'))+';this.draw=drawReplayStrip;',context);
+  context.draw([{t:12,lane:3,q:'perfect'},{t:-.5,lane:0,q:'good'},{t:3,lane:1,q:'miss'}],10);
+  assert.ok(strip.innerHTML.includes('100.000%'));assert.ok(strip.innerHTML.includes('0.000%'));assert.ok(strip.innerHTML.includes('top:46px'));assert.equal((strip.innerHTML.match(/<i /g)||[]).length,3);assert.ok(!strip.innerHTML.includes('rp-tip'));
+});
+
+test('disabling chord guides leaves gameplay and autoplay judgments intact', () => {
+  const h=harness([{t:2,lane:0,len:0},{t:2,lane:3,len:0}],{chordLinks:false,autoplay:true});
+  assert.equal(h.Game.chords.length,0);h.advance(1,2);assert.equal(h.Game.cnt.perfect,2);assert.equal(h.Game.cnt.miss,0);
 });

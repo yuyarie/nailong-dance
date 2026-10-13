@@ -1,16 +1,12 @@
 let ctx = null,
-  sfxGain = null,
-  sfxOn = true;
+  sfxGain = null;
 export function ensureCtx() {
   !ctx && (ctx = new (window.AudioContext || window.webkitAudioContext)(), sfxGain = ctx.createGain(), sfxGain.gain.value = 0.9, sfxGain.connect(ctx.destination));
   if (ctx.state === "suspended") ctx.resume();
   return ctx;
 }
-export function setSfxEnabled(_0x2eb4be) {
-  sfxOn = !!_0x2eb4be;
-}
 function ping(_0x2ceffb, _0x44e6c0 = 0.25, _0x322be1 = "sine", _0x544191 = 0.5, _0x9c00f1 = 0x0, _0x50ecd2 = 0x0) {
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0x16d0ba = ctx.currentTime + _0x9c00f1,
     _0x37f336 = ctx.createOscillator(),
     _0x731167 = ctx.createGain();
@@ -34,7 +30,7 @@ function getNoise() {
   return noiseBuf;
 }
 export function sfxWhoosh(_0x213ebf = -0.8, _0x318a58 = 0.8, _0x5e3442 = 0.85) {
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0x5725ea = ctx.currentTime,
     _0x31b4ca = ctx.createBufferSource();
   _0x31b4ca.buffer = getNoise();
@@ -51,21 +47,21 @@ export function sfxWhoosh(_0x213ebf = -0.8, _0x318a58 = 0.8, _0x5e3442 = 0.85) {
 }
 export function sfxCross() {
   ping(0x526, 0.3, "sine", 0.4), ping(0x6e0, 0.35, "sine", 0.32, 0.05);
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0x5493f2 = ctx.currentTime,
     _0x2bfb03 = ctx.createOscillator(),
     _0x11ba1b = ctx.createGain();
   _0x2bfb03.type = 'triangle', _0x2bfb03.frequency.setValueAtTime(0x384, _0x5493f2), _0x2bfb03.frequency.exponentialRampToValueAtTime(0xc80, _0x5493f2 + 0.22), _0x11ba1b.gain.setValueAtTime(0.18, _0x5493f2), _0x11ba1b.gain.exponentialRampToValueAtTime(0.001, _0x5493f2 + 0.25), route(_0x2bfb03, _0x11ba1b, 0x0, _0x5493f2, 0.25);
 }
 export function sfxBoop(_0x3cd814 = 0x0, _0x3a8a1a = 0x0) {
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0x1abf11 = ctx.currentTime + _0x3cd814,
     _0x43361f = ctx.createOscillator(),
     _0x29f2e8 = ctx.createGain();
   _0x43361f.type = "sine", _0x43361f.frequency.setValueAtTime(0x208, _0x1abf11), _0x43361f.frequency.exponentialRampToValueAtTime(0x96, _0x1abf11 + 0.14), _0x29f2e8.gain.setValueAtTime(0.4, _0x1abf11), _0x29f2e8.gain.exponentialRampToValueAtTime(0.001, _0x1abf11 + 0.16), route(_0x43361f, _0x29f2e8, _0x3a8a1a, _0x1abf11, 0.16);
 }
 export function sfxBoing() {
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0xc3796d = ctx.currentTime,
     _0x616d07 = ctx.createOscillator(),
     _0xdff5b2 = ctx.createGain();
@@ -75,20 +71,14 @@ export function sfxBoing() {
   _0x556633.frequency.setValueAtTime(0x1a, _0xc3796d), _0x556633.frequency.exponentialRampToValueAtTime(0x7, _0xc3796d + 0.5), _0x5ec448.gain.setValueAtTime(0x5a, _0xc3796d), _0x5ec448.gain.exponentialRampToValueAtTime(0x6, _0xc3796d + 0.5), _0x556633.connect(_0x5ec448), _0x5ec448.connect(_0x616d07.frequency), _0xdff5b2.gain.setValueAtTime(0.55, _0xc3796d), _0xdff5b2.gain.exponentialRampToValueAtTime(0.001, _0xc3796d + 0.6), _0x616d07.connect(_0xdff5b2), _0xdff5b2.connect(sfxGain), _0x616d07.start(_0xc3796d), _0x556633.start(_0xc3796d), _0x616d07.stop(_0xc3796d + 0.65), _0x556633.stop(_0xc3796d + 0.65), ping(0x46, 0.2, "sine", 0.6);
 }
 export function sfxOutro() {
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0x18514d = ctx.currentTime,
     _0x362843 = ctx.createOscillator(),
     _0x38aaf3 = ctx.createGain();
   _0x362843.type = "triangle", _0x362843.frequency.setValueAtTime(0x4e2, _0x18514d), _0x362843.frequency.exponentialRampToValueAtTime(0x140, _0x18514d + 0.8), _0x38aaf3.gain.setValueAtTime(0.16, _0x18514d), _0x38aaf3.gain.exponentialRampToValueAtTime(0.001, _0x18514d + 0.85), route(_0x362843, _0x38aaf3, 0x0, _0x18514d, 0.85);
 }
-export function sfxPerfect() {
-  ping(0x620, 0.18, "sine", 0.35), ping(0x82d, 0.22, "sine", 0.25, 0.03);
-}
-export function sfxGood() {
-  ping(0x370, 0.15, "triangle", 0.3);
-}
 export function sfxMiss() {
-  if (!ctx || !sfxOn) return;
+  if (!ctx) return;
   const _0x18c12b = ctx.currentTime,
     _0x129caf = ctx.createOscillator(),
     _0x4480d1 = ctx.createGain();
@@ -108,7 +98,6 @@ export function setVoiceVolume(_0x5e5cae) {
   voiceVol = Math.min(0x1, Math.max(0x0, +_0x5e5cae || 0x0));
 }
 function playVoiceFile(_0x210d8c) {
-  if (!sfxOn) return;
   try {
     const _0x512380 = new Audio(_0x210d8c);
     _0x512380.volume = voiceVol, _0x512380.play()['catch'](() => {});

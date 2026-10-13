@@ -108,7 +108,7 @@ const main = {
     let _0x3c25dd = _0x2f98ce >= 0x3 ? Math.min(devicePixelRatio, 0x3) : _0x2f98ce >= 0x2 ? Math.min(devicePixelRatio, 0x2) : _0x2f98ce >= 0x1 ? Math.min(devicePixelRatio, 1.5) : _0x2f98ce;
     renderer.setPixelRatio(_0x3c25dd);
   },
-  async startShow(song, audio, chart) {
+  async startShow(song, audio, chart, autoplay = false) {
     ensureCtx();
     Music.setSong(audio);
     const duration = await Music.awaitDuration();
@@ -121,7 +121,7 @@ const main = {
     resetBody(); Game.hooks.onEnd = onShowEnd; Game.hooks.onScore = null;
     Game.hooks.onJudge = null; Game.hooks.onSwap = null;
     document.getElementById('btnPause').style.display = '';
-    startGame({ diff: 'chart', bpm: chart.bpm, timing: chart.timing,
+    startGame({ autoplay, chordLinks: settings.chordLinks !== 0, diff: 'chart', bpm: chart.bpm, timing: chart.timing,
       offset: settings.offset, speed: settings.speed, duration, songId: song.id,
       customNotes: chart.notes });
     startStallWatch();
@@ -173,7 +173,7 @@ function onShowEnd(_0x418ca4) {
   const _0x288f6c = Store.data.stats.bestScore,
     _0x389b98 = _0x418ca4.score > _0x288f6c;
   showResult(_0x418ca4, _0x389b98);
-  const _0x3d11ed = checkAch();
+  const _0x3d11ed = _0x418ca4.autoplay ? [] : checkAch();
   if (_0x3d11ed.length) setTimeout(() => toast("🏆 成就达成：" + _0x3d11ed.map(_0xbdb3a5 => _0xbdb3a5.name).join('、')), 0x258);
   resetBody();
   if (_0x418ca4.acc >= 0.8) celebrate();else lieDown();
